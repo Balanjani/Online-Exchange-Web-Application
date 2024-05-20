@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
+    <link rel="stylesheet" href="registerstyles.css">
+    <!-- Add Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js"></script>
+    <!--<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"></script>-->
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAURhiWlvtieF3GEFEz9fAWmjbQLV3XVcY",
+            authDomain: "onlineexchange-44a62.firebaseapp.com",
+            projectId: "onlineexchange-44a62",
+            storageBucket: "onlineexchange-44a62.appspot.com",
+            messagingSenderId: "329400771365",
+            appId: "1:329400771365:web:317bd2bb80b75823a470cc"
+        };
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = auth();
+        const db = firestore();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Create new Account</h1>
+        <p>Already Registered? <a href="#">Log in here.</a></p>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+            <button type="submit">Sign up</button>
+        </form>
+    </div>
+    <script src="registerscript.js"></script>
+</body>
+</html>

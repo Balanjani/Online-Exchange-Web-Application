@@ -1,5 +1,13 @@
-document.getElementById('registrationForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+//document.getElementById('registrationForm').addEventListener('submit', function(event) {
+   // event.preventDefault();
+
+   document.getElementById('registrationForm').addEventListener('submit', function(event) {
+    // Here you could add form validation if needed
+    // Display the success message
+    //document.getElementById('successMessage');
+    //.style.display = 'block';
+    alert('Registration successful');
+
 
     // Get form values
     const name = document.getElementById('name').value;

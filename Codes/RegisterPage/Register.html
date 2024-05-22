@@ -6,9 +6,10 @@
     <title>Register Page</title>
     <link rel="stylesheet" href="registerstyles.css">
     <!-- Add Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js"></script>
-    <!--<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"></script>-->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <!--<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js" nomodule></script>-->
     <script>
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -19,11 +20,9 @@
             messagingSenderId: "329400771365",
             appId: "1:329400771365:web:317bd2bb80b75823a470cc"
         };
+
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = auth();
-        const db = firestore();
+        firebase.initializeApp(firebaseConfig);
     </script>
 </head>
 <body>
@@ -42,10 +41,6 @@
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="dob">Date of Birth</label>
-                <input type="date" id="dob" name="dob" required>
             </div>
             <button type="submit">Sign up</button>
         </form>

@@ -26,6 +26,10 @@
         }
         .profile-icon{
             font-size: 24px;
+            background-color: rgb(254, 254, 254);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
         }
         .menu-icon{
             font-size: 24px;
@@ -179,7 +183,60 @@
         </div>
     </div>
     
+    <!-- Profile Dropdown Menu -->
+    <div class="profile-menu" id="profileMenu">
+        <p id="userName" class="user-name"></p>
+        <a href="#">Orders</a>
+        <a href="#">My List</a>
+        <a href="profile.html">Profile</a>
+        <a href="#">Notifications</a>
+        <a href="#">Order History</a>
+        <a href="#">Payment Method</a>
     </div>
+
+    <script>
+        // Display the user's name from local storage
+        document.addEventListener('DOMContentLoaded', function() {
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('userName').textContent = Hello, ${userName};
+            }
+        });
+
+        // Toggle the profile menu when clicking on the profile icon
+        document.getElementById('profileIcon').addEventListener('click', function() {
+            const profileMenu = document.getElementById('profileMenu');
+            if (profileMenu.style.display === 'none' || profileMenu.style.display === '') {
+                profileMenu.style.display = 'block';
+            } else {
+                profileMenu.style.display = 'none';
+            }
+        });
+
+        // Hide the menu if clicked outside of it
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profileMenu');
+            const profileIcon = document.getElementById('profileIcon');
+
+            if (!profileMenu.contains(event.target) && !profileIcon.contains(event.target)) {
+                profileMenu.style.display = 'none';
+            }
+        });
+
+        document.getElementById('searchBar').addEventListener('input', function() {
+            const searchQuery = this.value.toLowerCase();
+            const gridItems = document.querySelectorAll('.grid-item');
+            
+            gridItems.forEach(function(item) {
+                const itemText = item.textContent.toLowerCase();
+                if (itemText.includes(searchQuery)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>

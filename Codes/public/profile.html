@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .profile-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-right: 10px;
+        }
+        .edit-icon {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .edit-icon:hover {
+            color: blue;
+        }
+        .edit-input {
+            display: none;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Profile</h1>
+    <div class="profile-container">
+        <div class="profile-icon"></div>
+        <p id="userName">Hello, User</p>
+        <span class="edit-icon" id="editIcon">&#9998;</span> <!-- Pencil icon for editing -->
+        <input type="text" id="editInput" class="edit-input" placeholder="Enter new name">
+        <button id="saveButton" class="edit-input">Save</button>
+    </div>
+
+    <script>
+        // Get the username from local storage and display it
+        document.addEventListener('DOMContentLoaded', function() {
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('userName').textContent = `Hello, ${userName}`;
+            }
+        });
+
+        const editIcon = document.getElementById('editIcon');
+        const editInput = document.getElementById('editInput');
+        const saveButton = document.getElementById('saveButton');
+        const userNameElement = document.getElementById('userName');
+
+        // Show input field when clicking the edit icon
+        editIcon.addEventListener('click', function() {
+            editInput.style.display = 'inline';
+            saveButton.style.display = 'inline';
+        });
+
+        // Save new name and update it in the database via an API call
+        saveButton.addEventListener('click', function() {
+            const newName = editInput.value;
+            if (newName) {
+                // Update localStorage
+                localStorage.setItem('userName', newName);
+                userNameElement.textContent = `Hello, ${newName}`;
+
+                // Call the backend API to update the name in MongoDB
+                fetch('/api/update-username', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ newName: newName }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Name updated successfully');
+                    } else {
+                        alert('Error updating name');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+                // Hide input and save button
+                editInput.style.display = 'none';
+                saveButton.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

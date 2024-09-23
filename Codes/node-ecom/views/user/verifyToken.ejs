@@ -1,0 +1,29 @@
+<%- include ../partials/header %> <%- include ../partials/categories-navbar %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 m-auto">
+      <h1 class="mt-4 mb-4">Verify Token</h1>
+      <!-- Flash message -->
+      <% if(errorMsg !=null && errorMsg.length>0) {%>
+      <div id="flash-msg" class="alert alert-danger">
+        <%=errorMsg %>
+      </div>
+      <%}%>
+      <form action="/user/verifyToken" method="POST">
+        <div class="form-group">
+          <label for="token">Token</label>
+          <input type="token" class="form-control" name="token" id="token" />
+        </div>
+        
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <button type="submit" class="btn btn-primary button-style">
+          Verify
+        </button>
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+<%- include ../partials/footer %>

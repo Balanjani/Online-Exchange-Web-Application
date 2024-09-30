@@ -1,0 +1,39 @@
+<%- include ../partials/header %> <%- include ../partials/categories-navbar %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 m-auto">
+      <h1 class="mt-4 mb-4">Dashboard</h1>
+      <!-- Flash message -->
+      <% if(errorMsg !=null && errorMsg.length>0) {%>
+      <div id="flash-msg" class="alert alert-danger">
+        <%=errorMsg %>
+      </div>
+      <%}%>
+      <div>
+        <div class="card border-dark mb-3" style="max-width: 18rem;">
+          <div class="card-header card-red">Products</div>
+          <div class="card-body text-dark">
+            <h5 class="card-title">Manage All  Products</h5>
+            <a class="btn btn-primary"  href="/supplier-admin/products">Products</a></h3>
+          </div>
+        </div>
+      
+      </div>
+      <div>
+        <div class="card border-dark mb-3" style="max-width: 18rem;">
+          <div class="card-header card-green">Categories</div>
+          <div class="card-body text-dark">
+            <h5 class="card-title ">Manage All  Categories</h5>
+            <a class="btn btn-primary"  href="/categories">Categories</a></h3>
+          </div>
+        </div>
+      
+      </div>
+      
+      
+    </div>
+  </div>
+</div>
+
+<%- include ../partials/footer %>

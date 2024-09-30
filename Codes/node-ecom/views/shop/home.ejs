@@ -53,9 +53,12 @@
   <h3 class="text-center mb-3 mt-4">Store's Categories</h3>
   <% if (categories) { %>
   <div class="row text-center m-auto">
-    <% for(let i=0; i<3; i++){ %>
+    <% for(let i=0; i<categories.length; i++){ %>
     <div class="col-lg-3 col-md-3 col-sm-12 text-center ml-2">
-      
+      <a class="title-link" href="/products/<%=categories[i].slug%>">
+        <img src="/uploads/<%= categories[i].imagePath %>" alt="category" class="circle-img" />
+        <h4 class="mb-3 mt-3"><%=categories[i].title%></h4>
+      </a>
     </div>
     <%} %>
     <div class="col-lg-1 col-md-1 col-sm-12 text-center mx-auto">
@@ -80,7 +83,9 @@
     <!--Controls-->
     <div class="controls-top mb-2">
       <div class="row">
-       
+        <div class="col-8">
+          <h3>Latest Products</h3>
+        </div>
         <div class="col-4">
           <div class="controls float-right hidden-xs">
             <a
@@ -95,174 +100,108 @@
             ></a>
           </div>
         </div>
-        
-        
       </div>
     </div>
     <!--/.Controls-->
 
     <!--Slides-->
-    <div  role="listbox">
+    <div class="carousel-inner" role="listbox">
       <!--First slide-->
-      <div class="">
+      <div class="carousel-item active">
         <div class="row">
-          
+          <% for(let i=0; i<products.length; i++) { %>
           <div class="col-md-4 product-index-box">
             <div class="single-product d-flex flex-column h-100">
               <a
                 class="title-link"
-                href="/pages/list"
+                href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>"
               >
                 <img
-                  src="/images/prod1.jpg"
+                  src="/uploads/<%= products[i].imagePath %>"
                   alt="Bag"
                   class="img-fluid"
               /></a>
               <div class="product-info">
                 <a
                   class="title-link"
-                  href="/pages/list"
+                  href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>"
                 >
-                  <h6 class="mt-2 mb-2">Electronics</h6></a
+                  <h6 class="mt-2 mb-2"><%= products[i].title %></h6></a
                 >
-               
+                <div class="price">$<%= products[i].price %></div>
               </div>
-              
-              
               
             </div>
           </div>
-          <div class="col-md-4 product-index-box">
-            <div class="single-product d-flex flex-column h-100">
-              <a
-                class="title-link"
-              >
-                <img
-                  src="/images/prod2.jpg"
-                  alt="Bag"
-                  class="img-fluid"
-              /></a>
-              <div class="product-info">
-                <a
-                  class="title-link"
-                >
-                  <h6 class="mt-2 mb-2">Shoes</h6></a
-                >
-               
-              </div>
-              
-             
-              
-              
-            </div>
-          </div>
-          <div class="col-md-4 product-index-box">
-            <div class="single-product d-flex flex-column h-100">
-              <a
-                class="title-link"
-              >
-                <img
-                  src="/images/prod3.jpg"
-                  alt="Bag"
-                  class="img-fluid"
-              /></a>
-              <div class="product-info">
-                <a
-                  class="title-link"
-                >
-                  <h6 class="mt-2 mb-2"> Smart Watches</h6></a
-                >
-               
-              </div>
-              
-              
-              
-            </div>
-          </div>
-          
+          <%}%>
         </div>
-
-        
-
-        <div class="row">
-          
-          <div class="col-md-4 product-index-box">
-            <div class="single-product d-flex flex-column h-100">
-              <a
-                class="title-link"
-              >
-                <img
-                  src="/images/prod4.jpg"
-                  alt="Bag"
-                  class="img-fluid"
-              /></a>
-              <div class="product-info">
-                <a
-                  class="title-link"
-                >
-                  <h6 class="mt-2 mb-2">Watches</h6></a
-                >
-               
-              </div>
-              
-             
-              
-            </div>
-          </div>
-          <div class="col-md-4 product-index-box">
-            <div class="single-product d-flex flex-column h-100">
-              <a
-                class="title-link"
-              >
-                <img
-                  src="/images/prod5.jpg"
-                  alt="Bag"
-                  class="img-fluid"
-              /></a>
-              <div class="product-info">
-                <a
-                  class="title-link"
-                >
-                  <h6 class="mt-2 mb-2">Bags</h6></a
-                >
-                
-              </div>
-              
-             
-              
-            </div>
-          </div>
-          <div class="col-md-4 product-index-box">
-            <div class="single-product d-flex flex-column h-100">
-              <a
-                class="title-link"
-              >
-                <img
-                  src="/images/prod6.jpg"
-                  alt="Bag"
-                  class="img-fluid"
-              /></a>
-              <div class="product-info">
-                <a
-                  class="title-link"
-                >
-                  <h6 class="mt-2 mb-2"> Sun Glasses</h6></a
-                >
-               
-              </div>
-             
-              
-              
-            </div>
-          </div>
-          
-        </div>
-
-
       </div>
       <!--/.First slide-->
 
-      
+      <!--Second slide-->
+      <div class="carousel-item">
+        <div class="row">
+          <% for(let i=3; i<products.length; i++) { %>
+          <div class="col-md-4 product-index-box">
+            <div class="single-product d-flex flex-column h-100">
+              <a
+                class="title-link"
+                href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>"
+              >
+                <img
+                  src="/uploads/<%= products[i].imagePath %>"
+                  alt="Bag"
+                  class="img-fluid"
+              /></a>
+              <div class="product-info">
+                <a
+                  class="title-link"
+                  href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>"
+                >
+                  <h6 class="mt-2 mb-2"><%= products[i].title %></h6></a
+                >
+                <div class="price">$<%= products[i].price %></div>
+              </div>
+              
+            </div>
+          </div>
+          <%}%>
+        </div>
+      </div>
+      <!--/.Second slide-->
+
+      <!--Third slide-->
+      <div class="carousel-item">
+        <div class="row">
+          <% for(let i=6; i<products.length; i++) { %>
+          <div class="col-md-4 product-index-box">
+            <div class="single-product d-flex flex-column h-100">
+              <a
+                class="title-link"
+                href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>"
+              >
+                <img
+                  src="/uploads/<%= products[i].imagePath %>"
+                  alt="Bag"
+                  class="img-fluid"
+              /></a>
+              <div class="product-info">
+                <a
+                  class="title-link"
+                  href="/products/<%=products[i].category.slug%>/<%=products[i]._id%>"
+                >
+                  <h6 class="mt-2 mb-2"><%= products[i].title %></h6></a
+                >
+                <div class="price">$<%= products[i].price %></div>
+              </div>
+              
+            </div>
+          </div>
+          <%}%>
+        </div>
+      </div>
+      <!--/.Third slide-->
+    </div>
     <!--/.Slides-->
   </div>
   <!--/.Carousel Wrapper-->

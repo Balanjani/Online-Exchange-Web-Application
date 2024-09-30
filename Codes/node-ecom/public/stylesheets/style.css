@@ -475,3 +475,18 @@ footer {
     height: 150px;
   }
 }
+
+
+
+
+.w-img-100 img{
+  width: 40px;
+    height: 40px;
+}
+
+.card-header.card-red {
+  background-color: #de5b6d;
+}
+.card-header.card-green {
+  background-color:#18a558
+}

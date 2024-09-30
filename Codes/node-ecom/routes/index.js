@@ -1,32 +1,22 @@
 const express = require("express");
 const csrf = require("csurf");
-
-
+const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+const Product = require("../models/product");
+const Category = require("../models/category");
+const Cart = require("../models/cart");
+const Order = require("../models/order");
 const middleware = require("../middleware");
 const router = express.Router();
 
-const csrfProtection = csrf();
-router.use(csrfProtection);
-
-let products = [
-  {
-    title: "Headphone",
-    imagePath: "",
-    description: 'Test description',
-    price: 21,
-    manufacturer: 'Schneider and Sons',
-    available: true,
-    category: 'test',
-
-  }
-]
+// const csrfProtection = csrf();
+// router.use(csrfProtection);
 
 // GET: home page
 router.get("/", async (req, res) => {
   try {
-    
-   
-
+    const products = await Product.find({})
+      .sort("-createdAt")
+      .populate("category");
       var message = req.flash("success")[0];
       console.log('11', req.flash("success"))
       console.log('22', req.flash("message"))
@@ -103,6 +93,7 @@ router.get("/shopping-cart", async (req, res) => {
       cart_user = await Cart.findOne({ user: req.user._id });
     }
     // if user is signed in and has cart, load user's cart from the db
+    console.log('cart hererer')
     if (req.user && cart_user) {
       req.session.cart = cart_user;
       return res.render("shop/shopping-cart", {
@@ -224,7 +215,7 @@ router.get("/checkout", middleware.isLoggedIn, async (req, res) => {
   const errMsg = req.flash("error")[0];
   res.render("shop/checkout", {
     total: cart.totalCost,
-    csrfToken: req.csrfToken(),
+    csrfToken: 'fdsf',
     errorMsg,
     pageName: "Checkout",
   });
@@ -236,42 +227,32 @@ router.post("/checkout", middleware.isLoggedIn, async (req, res) => {
     return res.redirect("/shopping-cart");
   }
   const cart = await Cart.findById(req.session.cart._id);
-  stripe.charges.create(
-    {
-      amount: cart.totalCost * 100,
-      currency: "usd",
-      source: req.body.stripeToken,
-      description: "Test charge",
+  const order = new Order({
+    user: req.user,
+    cart: {
+      totalQty: cart.totalQty,
+      totalCost: cart.totalCost,
+      items: cart.items,
     },
-    function (err, charge) {
-      if (err) {
-        req.flash("error", err.message);
-        console.log(err);
-        return res.redirect("/checkout");
-      }
-      const order = new Order({
-        user: req.user,
-        cart: {
-          totalQty: cart.totalQty,
-          totalCost: cart.totalCost,
-          items: cart.items,
-        },
-        address: req.body.address,
-        paymentId: charge.id,
-      });
-      order.save(async (err, newOrder) => {
-        if (err) {
-          console.log(err);
-          return res.redirect("/checkout");
-        }
-        await cart.save();
-        await Cart.findByIdAndDelete(cart._id);
-        req.flash("success", "Successfully purchased");
-        req.session.cart = null;
-        res.redirect("/user/profile");
-      });
+    address: req.body.address,
+    paymentId: charge.id,
+  });
+
+  order.save(async (err, newOrder) => {
+    if (err) {
+      console.log(err);
+      return res.redirect("/checkout");
     }
-  );
+    await cart.save();
+    await Cart.findByIdAndDelete(cart._id);
+    req.flash("success", "Successfully purchased");
+    req.session.cart = null;
+    res.redirect("/user/profile");
+  });
+
+
+  
+  
 });
 
 // create products array to store the info of each product in the cart

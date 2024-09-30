@@ -98,12 +98,4 @@ router.post(
   }
 );
 
-//GET: display abous us page
-router.get("/list", (req, res) => {
-  res.render("pages/list", {
-    pageName: "Products List",
-  });
-});
-
-
 module.exports = router;

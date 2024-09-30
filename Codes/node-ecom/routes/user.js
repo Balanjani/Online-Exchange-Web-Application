@@ -3,9 +3,10 @@ const router = express.Router();
 const csrf = require("csurf");
 var passport = require("passport");
 var LocalStrategy = require("passport-local").Strategy;
-
+const Product = require("../models/product");
+const Order = require("../models/order");
 const User = require("../models/user");
-
+const Cart = require("../models/cart");
 const middleware = require("../middleware");
 const {
   userSignUpValidationRules,
@@ -42,7 +43,21 @@ router.post(
   async (req, res) => {
     try {
       
-     
+      //if there is cart session, save it to the user's cart in db
+      
+      // if (req.session.cart) {
+      //   const cart = await new Cart(req.session.cart);
+      //   cart.user = req.user._id;
+      //   await cart.save();
+      // }
+      // redirect to the previous URL
+      // if (req.session.oldUrl) {
+      //   var oldUrl = req.session.oldUrl;
+      //   req.session.oldUrl = null;
+      //   // res.redirect(oldUrl);
+      // } else {
+      //   // res.redirect("/user/profile");
+      // }
       console.log('sucessssss fdsf f fd fd')
       req.flash("success", 'Verify from email');
       res.redirect("/");
@@ -78,7 +93,18 @@ router.post(
   ],
   async (req, res) => {
     try {
-     
+      // cart logic when the user logs in
+      let cart = await Cart.findOne({ user: req.user._id });
+      // if there is a cart session and user has no cart, save it to the user's cart in db
+      if (req.session.cart && !cart) {
+        const cart = await new Cart(req.session.cart);
+        cart.user = req.user._id;
+        await cart.save();
+      }
+      // if user has a cart in db, load it to session
+      if (cart) {
+        req.session.cart = cart;
+      }
       // redirect to old URL before signing in
       if (req.session.oldUrl) {
         var oldUrl = req.session.oldUrl;
@@ -117,7 +143,7 @@ router.get("/profile", middleware.isLoggedIn, async (req, res) => {
 // GET: logout
 router.get("/logout", middleware.isLoggedIn, (req, res) => {
   req.logout();
-  
+  req.session.cart = null;
   res.redirect("/");
 });
 
@@ -156,35 +182,6 @@ router.get("/verifyToken", middleware.isNotLoggedIn, async (req, res) => {
   //   pageName: "verify Token",
   // });
 });
-
-
-// router.post(
-//   "/verifyToken",
-  
-//   async (req, res) => {
-//     try {
-      
-//       console.log('fdsfds', req.body.token)
-//       let user = await User.findOne({ token: req.body.token, tokenstatus: true });
-//       if(!user)
-//       {
-//         req.flash("error", 'Invalid token');
-//         return res.redirect("/user/verifyToken");
-//       }
-      
-//       user.verified = true
-//       await user.save();
-
-//       console.log('user', user)
-//       req.flash("success", 'Email verified, please login ');
-//       return res.redirect("/");
-//     } catch (err) {
-//       console.log(err);
-//       req.flash("error", err.message);
-//       return res.redirect("/");
-//     }
-//   }
-// );
 
 
 module.exports = router;

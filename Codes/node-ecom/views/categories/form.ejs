@@ -1,0 +1,27 @@
+<%- include ../partials/header %>  <%- include ../partials/categories-navbar %>
+<div class="container">
+  <h2 style="text-align: center;">Category Form </h2>
+  <div style=" text-align: center;">
+  </div>
+
+
+
+  <form method="post" action="/categories/post"  enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="exampleInputEmail1">Title</label>
+      <input type="text" class="form-control" id="fdfd" name="title" value="<%= item.title %>" >
+      
+    </div>
+    
+    <div class="form-group">
+      <label for="exampleFormControlFile1">Image</label>
+      <input type="file" class="form-control-file" name="imagePath" id="fdffff" value="<%= item.imagePath %>" >
+    </div>
+    <input type="hidden" name="isNewRecord" value="<%= isNewRecord %>" />
+    <input type="hidden" name="id" value="<%= item.id %>" />
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+</div>
+
+<%- include ../partials/footer %>

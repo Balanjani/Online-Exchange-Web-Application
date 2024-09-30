@@ -8,19 +8,20 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const passport = require("passport");
 const flash = require("connect-flash");
-
+const Category = require("./models/category");
 var MongoStore = require("connect-mongo")(session);
 const connectDB = require("./config/db");
 
 const app = express();
 require("./config/passport");
 
-var hostname = ''
 // mongodb configuration
 connectDB();
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+
+
 
 
 app.use(logger("dev"));
@@ -50,13 +51,8 @@ app.use(async (req, res, next) => {
     res.locals.login = req.isAuthenticated();
     res.locals.session = req.session;
     res.locals.currentUser = req.user;
-    const categories = []
+    const categories = await Category.find({}).sort({ title: 1 }).exec();
     res.locals.categories = categories;
-
-    hostname = req.headers.host; // hostname = 'localhost:8080
-    console.log('hostname11', hostname)
-
-
     next();
   } catch (error) {
     console.log(error);
@@ -86,13 +82,19 @@ app.use(function (req, res, next) {
 
 //routes config
 const indexRouter = require("./routes/index");
-
+const productsRouter = require("./routes/products");
 const usersRouter = require("./routes/user");
 const pagesRouter = require("./routes/pages");
+const supplieradminRouter = require("./routes/supplieradmin");
+const categoriesRouter = require("./routes/categories");
+const userbids = require("./routes/userbids");
 const { emailSender } = require("./helper/EmailSender");
-
+app.use("/products", productsRouter);
 app.use("/user", usersRouter);
 app.use("/pages", pagesRouter);
+app.use("/supplier-admin", supplieradminRouter);
+app.use("/categories", categoriesRouter);
+app.use("/userbids", userbids);
 app.use("/", indexRouter);
 
 // catch 404 and forward to error handler
@@ -116,7 +118,6 @@ app.set("port", port);
 app.listen(port, () => {
   console.log("Server running at port " + port);
 });
-
 
 module.exports = app;
 

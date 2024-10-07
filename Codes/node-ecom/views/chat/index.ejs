@@ -1,0 +1,179 @@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        $(function() {
+            // require socker.io
+            var socket       = io(); 
+            var timeout;
+            var chat_input   = $('#m');
+            var message_to   = $('#message_to');
+            var message_from   = $('#message_from');
+            var message_from_name   = $('#message_from_name');
+            var chat_form    = $('form');
+            var users_ele    = $('#users');
+            var messages_ele = $('#message-list');
+            var typing_ele   = $('#typing');
+
+            messages_ele.scrollTop($('#message-list')[0].scrollHeight);
+
+            var send_nickname = function() {
+                var nickname = prompt("Please enter your nickname", makeid(4));
+
+                if (nickname != null) {
+                    socket.emit('send-nickname', nickname);
+
+                    window.nickname = nickname;
+
+                    // var _html = '<li class="list-group-item">Hello <strong>' + nickname + '</strong>! How are you today?</li>';
+                    // messages_ele.append(_html);
+                }
+            }
+
+            function timeout_function() {
+                socket.emit('event-typing', false);
+            }
+
+            function makeid(length) {
+                var result           = '';
+                var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                var charactersLength = characters.length;
+                for ( var i = 0; i < length; i++ ) {
+                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                }
+                return result;
+            }
+
+            // socket connect
+            socket.on('connect', function() {
+                window.socket_id = socket.id;
+            });
+
+            // send nickname
+            // send_nickname();
+
+            // get list user online
+            socket.on('users-list', function(users) {
+                if (users.length) {
+                    users_ele.html('');
+                    for (var i = 0, l = users.length; i < l; ++i) {
+                        var _u = users[i];
+                        var _me = '';
+                        if (_u.id == window.socket_id) {
+                            _me += '(me)'
+                        }
+                        var _html = '<li class="list-group-item user-item" data-id="' + _u.id + '"><span class="dot"></span> ' + _u.nickname + ' ' + _me + '</li>'
+                        users_ele.append(_html);
+                    }
+                }
+            });
+
+            
+
+            chat_form.submit(function(e) {
+                e.preventDefault(); // prevents page reloading
+
+                // emit chat-message to server side
+                var _a = {
+                    id: window.socket_id,
+                    nickname: window.nickname,
+                    msg: chat_input.val(),
+                    message_to: message_to.val(),
+                    message_from: message_from.val(),
+                    message_from_name: message_from_name.val(),
+                };
+                socket.emit('chat-message', _a);
+                chat_input.val('');
+
+                return false;
+            });
+
+           
+            // get emit chat-message from server site
+            socket.on('chat-message', function(res) {
+                console.log('message', res)
+
+                // remove typing item
+                typing_ele.find('#' + res.id).remove();
+
+                if (res.id == window.socket_id) {
+                    // it is me
+                    var _html = `
+                        <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2" >
+                                <div style="width: 100%;  font-size: 1em; font-weight: 700;">${res.message_from_name}</div>
+                                <div style="width: 100%;">${res.msg}</div>
+                        </div>
+                    
+                    `;
+                    
+                    
+                } else {
+                    var _html = `
+                        <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2" >
+                                <div style="width: 100%;  font-size: 1em; font-weight: 700;">${res.message_from_name}</div>
+                                <div style="width: 100%;">${res.msg}</div>
+                        </div>
+                    
+                    `;
+                }
+
+                // _html += '<span class="chat-msg-msg">' + res.msg + '</span>';
+
+                messages_ele.append(_html);
+                messages_ele.scrollTop($('#message-list')[0].scrollHeight);
+            });
+        });
+    </script>
+
+<%- include ../partials/header %> <%- include ../partials/categories-navbar %>
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+           
+        </div>
+        <div class="col-6">
+           
+           
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <div class="chat-container" id="chat-container1">
+                <div class="quikchat-base quikchat-theme-light">
+                    <div class="quikchat-title-area" style="text-align: left;">Chat</div>
+                    <div class="quikchat-messages-area quikchat-messages-area-alt" style="height: calc(100% - 365px);" id="message-list">
+                        <% for(let i=0; i<messages.length; i++) { %>
+                            <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2 <%= toString([i].userFrom) == toString(userFrom) ? 'text-left' : 'test-right'%>">
+                                <div style="width: 100%;  font-size: 1em; font-weight: 700;"><%=messages[i].userFrom.username%></div>
+                                <div style="width: 100%;"><%=messages[i].message%></div>
+                            </div>
+                        <%}%>
+                        
+                       
+                    </div>
+                    <div class="quikchat-input-area">
+                         <form>
+                            <div class="form-group">
+                                <input type="text" name="m" id="m" value="" class="form-control" placeholder="Enter your message..." required>
+                            </div>
+                            <input type="hidden" value="<%=userTo%>" id="message_to"> 
+                            <input type="hidden" value="<%=userFrom%>" id="message_from"> 
+                            <input type="hidden" value="<%=userFromName%>" id="message_from_name"> 
+            
+                            <button type="submit" class="btn btn-success">SEND</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<%- include ../partials/footer %>

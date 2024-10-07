@@ -490,3 +490,76 @@ footer {
 .card-header.card-green {
   background-color:#18a558
 }
+
+
+
+
+
+
+
+
+
+
+.chat-container {
+    height: 50vh;
+    width: 95%;
+    border-radius: 1em;
+}
+
+.quikchat-theme-light {
+  border: 1px solid #cccccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+.quikchat-base {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 200px;
+  min-height: 200px;
+  box-sizing: border-box !important;
+}
+
+.quikchat-theme-light .quikchat-title-area {
+  padding: 8px;
+  color: #333;
+}
+.quikchat-title-area {
+  margin-left: 8px;
+  margin-right: 8px;
+  padding-left: 2px;
+  padding-right: 2px;
+  padding: 8px;
+  font-weight: 600;
+  font-size: 1.3em;
+  box-sizing: border-box;
+}
+.quikchat-theme-light .quikchat-messages-area {
+  background-color: #ffffffe2;
+  color: #333;
+  border-radius: 1em;
+}
+.quikchat-messages-area {
+  flex-grow: 1;
+  padding: 8px;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+.quikchat-theme-light .quikchat-messages-area-alt .quikchat-message:nth-child(odd) {
+  background-color: #fffffff0;
+  color: #005662;
+  border-radius: 4px;
+}
+.quikchat-message {
+  padding: 4px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  box-sizing: border-box;
+}
+
+.quikchat-message-2 {
+      line-height: 6px;
+    }

@@ -4,17 +4,22 @@ const userSignUpValidationRules = () => {
   return [
     check("name", "Name is required").not().isEmpty(),
     check("email", "Invalid email").not().isEmpty().isEmail(),
-    check("password", "Please enter a password with 4 or more characters")
+    check("password", "Password must be at least 4 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character")
       .not()
       .isEmpty()
-      .isLength({ min: 4 }),
+      .isLength({ min: 4 })
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{4,}$/),
   ];
 };
 
 const userSignInValidationRules = () => {
   return [
     check("email", "Invalid email").not().isEmpty().isEmail(),
-    check("password", "Invalid password").not().isEmpty().isLength({ min: 4 }),
+    check("password", "Password must be at least 4 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+      .not()
+      .isEmpty()
+      .isLength({ min: 4 })
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{4,}$/),
   ];
 };
 

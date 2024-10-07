@@ -13,6 +13,8 @@ var MongoStore = require("connect-mongo")(session);
 const connectDB = require("./config/db");
 
 const app = express();
+const http    = require('http').Server(app);
+const io      = require('socket.io')(http);
 require("./config/passport");
 
 // mongodb configuration
@@ -87,13 +89,16 @@ const usersRouter = require("./routes/user");
 const pagesRouter = require("./routes/pages");
 const supplieradminRouter = require("./routes/supplieradmin");
 const categoriesRouter = require("./routes/categories");
+const chatRouter = require("./routes/chat");
 const userbids = require("./routes/userbids");
 const { emailSender } = require("./helper/EmailSender");
+const { addMessage } = require("./service/chatService");
 app.use("/products", productsRouter);
 app.use("/user", usersRouter);
 app.use("/pages", pagesRouter);
 app.use("/supplier-admin", supplieradminRouter);
 app.use("/categories", categoriesRouter);
+app.use("/chat", chatRouter);
 app.use("/userbids", userbids);
 app.use("/", indexRouter);
 
@@ -113,9 +118,57 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
+
+
+
+
+
+io.on('connection', function(socket) {
+    console.log('a user connected');
+    // console.log('socket id server: '+socket.id);
+  
+    // event send nickname
+    socket.on('send-nickname', function(nickname) {
+      socket.nickname = nickname;
+      var _t = {
+          id: socket.id,
+          nickname: socket.nickname
+      }
+      users.push(_t);
+  
+      // send users-list to client site
+      io.emit('users-list', users);
+    });
+  
+    // event send nickname
+    socket.on('event-typing', function(data) {
+      if (data) {
+          io.emit('event-typing', data);
+      }
+    });
+  
+    // event chat
+    socket.on('chat-message', function(data) {
+      // send emit chat-message to client site
+      io.emit('chat-message', data);
+      addMessage(data)
+      
+    });
+  
+    // socket disconect
+    socket.on('disconnect', function() {
+      console.log('user disconnected');
+  
+      //removeItem(users, 'id', socket.id);
+    });
+  });
+
 var port = process.env.PORT || 3000;
 app.set("port", port);
-app.listen(port, () => {
+
+app.set('socketio', io);
+
+http.listen(port, () => {
   console.log("Server running at port " + port);
 });
 

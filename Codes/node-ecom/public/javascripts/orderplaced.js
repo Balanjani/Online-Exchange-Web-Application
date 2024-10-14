@@ -73,3 +73,64 @@
       <!-- Orders will be dynamically inserted here -->
     </tbody>
   </table>
+  <script>
+    // Function to fetch orders from the API
+    async function fetchOrders() {
+      const apiUrl = 'https://api.example.com/orders'; // Replace with your API endpoint
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error('Failed to fetch orders');
+        }
+        const orders = await response.json();
+        displayOrders(orders);
+      } catch (error) {
+        displayError(error.message);
+      }
+    }
+
+    // Function to display orders in the table
+    function displayOrders(orders) {
+      const ordersList = document.getElementById('ordersList');
+      const statusMessage = document.getElementById('statusMessage');
+      const ordersTable = document.getElementById('ordersTable');
+
+      // Clear loading message
+      statusMessage.style.display = 'none';
+      ordersTable.style.display = 'table';
+
+      if (orders.length === 0) {
+        statusMessage.style.display = 'block';
+        statusMessage.textContent = 'No orders placed yet.';
+        return;
+      }
+
+      orders.forEach(order => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.asset}</td>
+          <td>${order.quantity}</td>
+          <td>$${order.price.toFixed(2)}</td>
+          <td><span class="status ${order.status.toLowerCase()}">${order.status}</span></td>
+          <td>${new Date(order.date).toLocaleString()}</td>
+        `;
+
+        ordersList.appendChild(row);
+      });
+    }
+
+    // Function to display error message
+    function displayError(message) {
+      const statusMessage = document.getElementById('statusMessage');
+      statusMessage.className = 'error';
+      statusMessage.textContent = Error: ${message};
+    }
+
+    // Load orders when the page is loaded
+    document.addEventListener('DOMContentLoaded', fetchOrders);
+  </script>
+
+</body>
+</html>

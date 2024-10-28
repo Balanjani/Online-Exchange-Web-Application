@@ -27,6 +27,14 @@ const userSchema = Schema({
     type: Boolean,
     require: false,
   },
+  address: {
+    type: String,
+    require: false,
+  },
+  phone: {
+    type: String,
+    require: false,
+  },
 });
 
 // encrypt the password before storing

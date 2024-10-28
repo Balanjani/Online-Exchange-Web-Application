@@ -36,6 +36,11 @@ const productSchema = Schema({
     required: false,
     default: false,
   },
+  quantity: {
+    type: Number,
+    required: false,
+    default: 1,
+  },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",

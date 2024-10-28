@@ -23,9 +23,9 @@ const bidSchema = Schema({
     ref: "Product",
   },
   confirm: {
-    type: Boolean,
+    type: Number,
     required: false,
-    default: false
+    default: 0
   },
 });
 

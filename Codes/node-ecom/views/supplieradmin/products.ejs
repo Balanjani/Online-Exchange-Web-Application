@@ -63,7 +63,7 @@
           <th scope="col">Title</th>
           <th scope="col">Price</th>
           <th scope="col">Available</th>
-          <!-- <th scope="col">Bids</th>
+          <!-- <!-- <th scope="col">Bids</th> -->
           <th scope="col">Actions</th> -->
         </tr>
       </thead>
@@ -79,7 +79,7 @@
           <% } else { %>
           <td>No</td>
           <%} %>
-          <!-- <td><a href="/supplier-admin/bids/<%=product._id%>">Show Bids</a> </td> -->
+          <td><a href="/supplier-admin/bids/<%=product._id%>">Show Bids</a> </td>
           <td><%- include ../partials/action-btns %></td>
         </tr>
         <% }) %>

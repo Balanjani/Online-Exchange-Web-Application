@@ -55,16 +55,26 @@
           <th scope="col">#</th>
           <th scope="col">Amount</th>
           <th scope="col">createdAt</th>
-          <th scope="col">ConfirmBid</th>
+          <th scope="col">Confirm / Reject</th>
         </tr>
       </thead>
       <tbody>
-        <% items.forEach((product) => { %>
+        <% items.forEach((item) => { %>
         <tr>
           <td scope="row">1</td>
-          <td><%= product.amount %></td>
-          <td><%= product.createdAt %></td>
-          <td><a href="/supplier-admin/bidconfirm/<%=product._id%>">Confirm Bid</a> </td>
+          <td><%= item.amount %></td>
+          <td><%= item.createdAt %></td>
+          <td>
+            <% if(item.confirm == 0) { %>
+
+            <a href="/supplier-admin/bidconfirm/<%=item._id%>?confirm=1">Confirm / </a> 
+            <a href="/supplier-admin/bidconfirm/<%=item._id%>?confirm=2">Reject </a> 
+            <% } else{ %>
+           
+            <%=item.confirm == 1 ? 'Confirmed' : 'Rejected' %>
+              
+              <% } %>
+          </td>
          
         </tr>
         <% }) %>

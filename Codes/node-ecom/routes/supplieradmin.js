@@ -10,6 +10,8 @@ const User = require("../models/user");
 var moment = require("moment");
 var multer  = require('multer');
 var path = require('path');
+var mongodb = require('mongodb');
+
 
 var Storage= multer.diskStorage({
   destination:"./public/uploads/",
@@ -51,14 +53,15 @@ router.get("/", middleware.isLoggedIn, async (req, res) => {
 // GET: display user's profile
 router.get("/products", middleware.isLoggedIn, async (req, res) => {
     
-
+    var loginUser = req.user
+    console.log('loginUser', loginUser._id)
     // var products =productModel.find({}); 
     let page = parseInt(req.query.page) || 1;
 
     try {
      
       const perPage = 8;
-      const allProducts = await productModel.find({  })
+      const allProducts = await productModel.find({user: loginUser._id })
       .skip(perPage * page - perPage)
       .limit(perPage);
       
@@ -229,6 +232,7 @@ router.post("/products/post", upload,
     productDetails.description = req.body.description;
     productDetails.bidDateOpen = req.body.bidDateOpen;
     productDetails.bidDateClose = req.body.bidDateClose;
+    productDetails.quantity = req.body.quantity;
     
 
     // var productDetails = new productModel({
@@ -279,9 +283,12 @@ router.get("/bids/:id", middleware.isLoggedIn, async (req, res) => {
     let page = parseInt(req.query.page) || 1;
     // const items = await Bid.find({productId: req.params.id});
     const perPage = 8;
-      const items = await Bid.find({productId: req.params.id})
-      .skip(perPage * page - perPage)
+      const items = await Bid.find({productId: req.params.id}) .skip(perPage * page - perPage)
       .limit(perPage)
+
+
+      const product = await productModel.findById(req.params.id)
+     
       //.populate("productId");
       
       console.log('items', items)
@@ -293,9 +300,10 @@ router.get("/bids/:id", middleware.isLoggedIn, async (req, res) => {
         items: items,
         current: page,
         breadcrumbs: req.breadcrumbs,
-        home: currentRoute + "?",
+        home: currentRoute + "bids/" + req.params.id + "?",
         actionHome: currentRoute + "",
         pages: Math.ceil(count / perPage),
+        product:product,
       });
 
 
@@ -321,22 +329,28 @@ router.get("/bidconfirm/:id", middleware.isLoggedIn, async (req, res) => {
 
   try {
     let page = parseInt(req.query.page) || 1;
+    let action = parseInt(req.query.confirm) ;
     // const items = await Bid.find({productId: req.params.id});
     const perPage = 8;
       const item = await Bid.findById(req.params.id)
       const product = await productModel.findById(item.productId)
       
       //.populate("productId");
+      console.log('action', action)
       
-      item.confirm = true
+      item.confirm = action
       
 
       item.save(function(err, data){
         if(err) console.log(err);
         console.log(data)
 
-        product.bidConfirmed = true
-        product.save()
+        if(action == 1)
+        {
+          product.bidConfirmed = true
+          product.save()
+        }
+        
 
 
         return res.redirect("/supplier-admin/products");
@@ -346,6 +360,23 @@ router.get("/bidconfirm/:id", middleware.isLoggedIn, async (req, res) => {
 
 
     
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
+// GET: display user's profile
+router.get("/products/delete/:slug", middleware.isLoggedIn, async (req, res) => {
+    
+ 
+  try {
+     
+    const result = await productModel.deleteOne({_id: new mongodb.ObjectID(req.params.slug )} );
+  
+    return res.redirect("/supplier-admin/products");
+
   } catch (err) {
     console.log(err);
     return res.redirect("/");

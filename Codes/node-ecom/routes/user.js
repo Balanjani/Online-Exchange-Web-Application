@@ -16,13 +16,13 @@ const {
 } = require("../config/validator");
 
 const csrfProtection = csrf();
-router.use(csrfProtection);
+// router.use(csrfProtection);
 
 // GET: display the signup form with csrf token
 router.get("/signup", middleware.isNotLoggedIn, (req, res) => {
   var errorMsg = req.flash("error")[0];
   res.render("user/signup", {
-    csrfToken: req.csrfToken(),
+    csrfToken:'fsdfsd',
     errorMsg,
     pageName: "Sign Up",
   });
@@ -73,7 +73,7 @@ router.post(
 router.get("/signin", middleware.isNotLoggedIn, async (req, res) => {
   var errorMsg = req.flash("error")[0];
   res.render("user/signin", {
-    csrfToken: req.csrfToken(),
+    csrfToken: 'fdsfds',
     errorMsg,
     pageName: "Sign In",
   });
@@ -121,6 +121,7 @@ router.post(
   }
 );
 
+
 // GET: display user's profile
 router.get("/profile", middleware.isLoggedIn, async (req, res) => {
   const successMsg = req.flash("success")[0];
@@ -139,6 +140,101 @@ router.get("/profile", middleware.isLoggedIn, async (req, res) => {
     return res.redirect("/");
   }
 });
+
+
+
+// GET: display user's profile
+router.get("/profileupdate", middleware.isLoggedIn, async (req, res) => {
+  const successMsg = req.flash("success")[0];
+  const errorMsg = req.flash("error")[0];
+   let user = await User.findById(req.user._id );
+   console.log('user', user)
+  try {
+    // find all orders of this user
+   
+    res.render("user/profileupdate", {
+      user: user,
+      errorMsg,
+      successMsg,
+      pageName: "User Profile",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+// GET: display user's profile
+router.get("/updatepassword", middleware.isLoggedIn, async (req, res) => {
+  
+  const successMsg = req.flash("success")[0];
+  const errorMsg = req.flash("error")[0];
+   let user = await User.findById(req.user._id );
+   console.log('user', user)
+  try {
+    // find all orders of this user
+   
+    res.render("user/updatepassword", {
+      user: user,
+      errorMsg,
+      successMsg,
+      pageName: "User Profile",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
+
+// GET: display user's profile
+router.post("/updatepassword",
+  [
+    middleware.isLoggedIn,
+    
+  ],
+   async (req, res) => {
+  // console.log('req.params.slug', req.params.slug)
+  
+  console.log('reqest  fdfdsf', req.body)
+  
+  try {
+
+    var model =  await User.findById(req.user._id );
+    
+    
+   
+    //var productDetails = await productModel.findById(req.body.id)
+    console.log('model', model)
+    let pass = req.body.pass;
+    let confirm = req.body.confirmpass;
+    
+    if(pass != confirm)
+    {
+      req.flash("error", 'Passwords not match');
+      res.redirect("/user/updatepassword");
+      return true;
+    }
+    else{
+      model.password = model.encryptPassword(pass);
+    
+      model.save(function(err, data){
+          if(err) console.log(err);
+          console.log(data)
+          return res.redirect('/');
+      })
+    }
+
+    
+
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
 
 // GET: logout
 router.get("/logout", middleware.isLoggedIn, (req, res) => {

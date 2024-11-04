@@ -1,37 +1,67 @@
-<%- include ../partials/header %>  <%- include ../partials/categories-navbar %>
-
-
+<%- include ../partials/header %>  
+<%- include ../partials/categories-navbar %>
 
 <div class="container">
+  <!-- User Profile Update -->
   <h2 style="text-align: center;">User Profile</h2>
-  <div style=" text-align: center;">
-  </div>
 
-
-
-  <form method="post" action="/user/profileupdate" >
+  <form method="post" action="/user/profileupdate">
     <div class="form-group">
-      <label for="exampleInputEmail1">Name</label>
-      <input type="text" class="form-control" id="fdfd" name="username" value="<%= user.username %>" required="true" >
-      
+      <label for="username">Name</label>
+      <input type="text" class="form-control" id="username" name="username" value="<%= user.username %>" required>
     </div>
     <div class="form-group">
-      <label for="exampleInputEmail1">Address</label>
-      <input type="text" class="form-control" id="fdfd" name="address" value="<%= user.address %>" required="true" >
-      
+      <label for="address">Address</label>
+      <input type="text" class="form-control" id="address" name="address" value="<%= user.address %>" required>
     </div>
     <div class="form-group">
-      <label for="exampleInputEmail1">Phone</label>
-      <input type="text" class="form-control" id="fdfd" name="phone" value="<%= user.phone %>" required="true" >
-      
+      <label for="phone">Phone</label>
+      <input type="text" class="form-control" id="phone" name="phone" value="<%= user.phone %>" required>
     </div>
     
-    
-   
-    <input type="hidden" name="id" value="<%= user._id %>" />
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <input type="hidden" name="id" value="<%= user._id %>">
+    <button type="submit" class="btn btn-primary">Update Profile</button>
   </form>
-
 </div>
+
+<hr>
+
+<div class="container">
+  <!-- Password Update Section -->
+  <h2 style="text-align: center;">Password Update</h2>
+
+  <!-- Email Validation Form (Request OTP) -->
+  <form method="post" action="/user/request-otp">
+    <div class="form-group">
+      <label for="email">Registered email:</label>
+      <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>" readonly>
+    </div>
+    <button type="submit" class="btn btn-primary">Request OTP</button>
+  </form>
+</div>
+<div class="container">
+  <h2 style="text-align: center;">Verify OTP & Update Password</h2>
+
+  <!-- OTP Verification and Password Update Form -->
+  <form method="post" action="/user/verify-otp">
+    <div class="form-group">
+      <label for="otp">Enter OTP sent to your email:</label>
+      <input type="text" class="form-control" id="otp" name="otp" required>
+    </div>
+
+    <div class="form-group">
+      <label for="newpass">New Password:</label>
+      <input type="password" class="form-control" id="newpass" name="newpass" required>
+    </div>
+
+    <div class="form-group">
+      <label for="confirmpass">Confirm Password:</label>
+      <input type="password" class="form-control" id="confirmpass" name="confirmpass" required>
+    </div>
+
+    <button type="submit" class="btn btn-secondary">Update Password</button>
+  </form>
+</div>
+
 
 <%- include ../partials/footer %>

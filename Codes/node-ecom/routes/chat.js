@@ -7,6 +7,7 @@ const User = require("../models/user");
 const Chat = require("../models/chat");
 
 var _ = require('underscore');
+const chat = require("../models/chat");
 
 
 // const io      = require('socket.io')(http);
@@ -21,16 +22,46 @@ router.get("/chatseller/:userid", middleware.isLoggedIn, async (req, res) => {
   
     
     // const messages = await Chat.find({userFrom : req.user._id, userTo: req.params.userid}).populate(["userTo", "userFrom"]);
-    const messages = await Chat.find({$or:[{"userFrom":req.user._id},{"userTo":req.params.userid}] }).populate(["userTo", "userFrom"]);
+    // const messages = await Chat.find({$or:[{"userFrom":req.user._id},{"userTo":req.params.userid}] }).populate(["userTo", "userFrom"]);
+    const messages = await Chat.find(
+      {
+        $or:[
+          {userTo : req.user._id, userFrom: req.params.userid},
+          {userFrom : req.user._id, userTo: req.params.userid}
+        ]
+      }
+    ).populate(["userTo", "userFrom"]);
                       
-    console.log('messages', messages)
+
+    if(messages)
+    {
+      messages.forEach(mess => {
+        if(messageTo = req.user._id)
+        {
+          mess.messageReadTo= true;
+          mess.save()
+        }
+        
+      });
+     
+    }
+
+    // console.log('messages', messages)
     let userToModel = await User.findById( req.params.userid)
     let userFromModel = await User.findById( req.user._id)
     let userTo = req.params.userid
     let userFrom = req.user._id
     let userFromName = userFromModel.username
     let userToName = userToModel.username
-    console.log('userFromModel', userFromModel)
+
+    let currentUserId = req.user._id
+    // console.log('userFromModel', userFromModel)
+
+    // const messagesNotification = await Chat.find({userfrom: req.user._id}).populate(["userTo", "userFrom"]);
+    // if(messagesNotification)
+    //   messagesNotification[messagesNotification.length - 1].notificationStatus = true
+    //   messagesNotification[messagesNotification.length - 1].save()
+
 
     try {
      
@@ -42,6 +73,7 @@ router.get("/chatseller/:userid", middleware.isLoggedIn, async (req, res) => {
         userFrom: userFrom,
         userFromName: userFromName,
         userToName: userToName,
+        currentUserId: currentUserId,
         messages: messages,
       });
 
@@ -61,14 +93,27 @@ router.get("/seller", middleware.isLoggedIn, async (req, res) => {
 
     
     
-    const messages = await Chat.find({userTo: req.user._id}).populate(["userTo", "userFrom"]);
+    const messages = await Chat.find({userTo: req.user._id}).populate(["userTo", "userFrom"]).sort({createdAt: 'desc'});;
   
-    console.log('messages', messages)
+    // console.log('messages', messages)
+    
 
     var destArray = _.uniq(messages, function(x){
-      return x.userTo._id;
+      return x.userFrom._id;
     });
-    console.log('destArray', destArray)
+     console.log('destArray', destArray)
+    
+   
+    
+    _.each(messages, function(x) { 
+      let message = x + ' '
+      if(x.userFrom._id == req.user._id)
+      {
+        
+      }
+    }
+    );
+
     
 
     
@@ -94,6 +139,20 @@ router.get("/seller", middleware.isLoggedIn, async (req, res) => {
   });
 
 
+
+
+  
+// GET: logout
+router.get("/changeMessageReadStatus", middleware.isLoggedIn, async (req, res) => {
+
+
+  let chatMessage =  await chat.findById(req.query.id );
+  console.log('req.query.id', req.query.id)
+  chatMessage.messageReadTo = true;
+  chatMessage.save();
+  
+  
+});
 
 
 

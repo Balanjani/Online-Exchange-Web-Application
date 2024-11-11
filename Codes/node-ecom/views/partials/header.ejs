@@ -24,6 +24,7 @@
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
       crossorigin="anonymous"
     />
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
 
     <script
       src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
@@ -31,10 +32,12 @@
       crossorigin="anonymous"
     ></script>
 
-    <script
+    <!-- <script
       src="https://kit.fontawesome.com/91abd10b8f.js"
       crossorigin="anonymous"
-    ></script>
+    ></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js" integrity="sha512-6sSYJqDreZRZGkJ3b+YfdhB3MzmuP9R7X1QZ6g5aIXhRvR1Y/N/P47jmnkENm7YL3oqsmI6AK+V6AD99uWDnIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <link rel="stylesheet" href="/stylesheets/style.css" />
 
@@ -68,7 +71,7 @@
       <div class="col-md-4 col-sm-12 col-xs-12 logo-container">
         <a href="/">
           <!-- <img class="logo-img img-fluid" src="/images/shop-icon.png" alt="logo" /> -->
-          <h4 class="logo-title">Online Exchange</h4>
+          <h4 class="logo-title">My Website</h4>
         </a>
       </div>
 
@@ -86,7 +89,28 @@
             </a>
           </li>
           <% if (login) { %>
-          <li>
+            <li>
+              <div class="dropdown1 nav-link">
+                <span>
+                  <i class="fas fa-info-circle"></i> 
+                  <span class="badge badge-pill badge-info " id="noti-count"><%=notifications.length %></span>
+                </span>
+                <div class="dropdown-content notifications">
+                  <ul>
+                  <% if (notifications) { %>
+                    <% notifications.forEach( notification => { %>
+                      <li class="nav-item dis-block"> 
+                        <%=notification.message%>
+                    </li>
+                      <% }) %>
+                  <% } %>
+                </ul>
+                </div>
+              </div>
+                
+                
+            </li>
+            <li>
             <a
               class="dropdown-toggle"
               href="#"
@@ -98,8 +122,9 @@
               <i class="fas fa-user"></i> Welcome <%=currentUser.username%>
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="/user/profile">User Account</a>
+              <a class="dropdown-item" href="/user/profile">My Orders</a>
               <a class="dropdown-item" href="/user/profileupdate">Profile</a>
+              <a class="dropdown-item" href="/user/updatepassword">Change password</a>
               <a class="dropdown-item" href="/supplier-admin">Supplier Dashboard</a>
               <div class="dropdown-divider"></div>
               <a class="dropdown-item" href="/user/logout">Logout</a>
@@ -115,5 +140,39 @@
           <% }%>
         </ul>
       </div>
+      <input type="checkbox" id="noticheck" class="hidden"/>
+      <input type="hidden" id="baseurl" class="hidden" value="<%=baseUrl%>"/>
     </div>
 
+
+
+
+    <script>
+      $(function() {
+          // require socker.io
+          
+          let url = $('#baseurl').val()
+
+          url = url + '/user/notificationsstatuschange'
+          $('.dropdown1').click(function(){
+           
+            if(!($('#noticheck').is(':checked')))
+            {
+              $.ajax({url, success: function(result){
+                //$("#div1").html(result);
+                // alert('fdsf')
+              }});
+            }
+            else{
+              $('#noti-count').text(0)
+            }
+            $('.dropdown-content.notifications').toggle()
+            $('input[type=checkbox]').click();
+          })
+          
+
+
+          
+
+      });
+  </script>

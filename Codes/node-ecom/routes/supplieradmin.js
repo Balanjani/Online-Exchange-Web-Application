@@ -11,6 +11,7 @@ var moment = require("moment");
 var multer  = require('multer');
 var path = require('path');
 var mongodb = require('mongodb');
+const { addNotificationBid } = require("../service/notificationService");
 
 
 var Storage= multer.diskStorage({
@@ -33,7 +34,7 @@ var currentRoute = '/supplier-admin/'
 router.get("/", middleware.isLoggedIn, async (req, res) => {
     const successMsg = req.flash("success")[0];
     const errorMsg = req.flash("error")[0];
-    console.log('fdsfdsfdsfdsfds')
+   
     try {
       // find all orders of this user
       //allOrders = await Order.find({ user: req.user });
@@ -54,7 +55,7 @@ router.get("/", middleware.isLoggedIn, async (req, res) => {
 router.get("/products", middleware.isLoggedIn, async (req, res) => {
     
     var loginUser = req.user
-    console.log('loginUser', loginUser._id)
+    
     // var products =productModel.find({}); 
     let page = parseInt(req.query.page) || 1;
 
@@ -65,8 +66,8 @@ router.get("/products", middleware.isLoggedIn, async (req, res) => {
       .skip(perPage * page - perPage)
       .limit(perPage);
       
-      const count = await productModel.count({  });
-
+      const count = await productModel.count({user: loginUser._id });
+    
       res.render("supplieradmin/products", {
         pageName: 'My Products',
         //currentCategory: foundCategory,
@@ -92,8 +93,6 @@ router.get("/products", middleware.isLoggedIn, async (req, res) => {
 // GET: display user's profile
 router.get("/products/view/:slug", middleware.isLoggedIn, async (req, res) => {
     
-console.log('req.params.slug', req.params.slug)
-  
 
   try {
    
@@ -117,9 +116,7 @@ console.log('req.params.slug', req.params.slug)
   
 // GET: display user's profile
 router.get("/products/edit/:slug", middleware.isLoggedIn, async (req, res) => {
-    
-console.log('req.params.slug', req.params.slug)
-  
+
 
 try {
     
@@ -156,16 +153,14 @@ try {
 
 // GET: display user's profile
 router.get("/products/add", middleware.isLoggedIn, async (req, res) => {
-    // console.log('req.params.slug', req.params.slug)
-    
+ 
     var loginUser = req.user
-    // console.log('loginUser',loginUser)
-    // console.log('req.user',req.user)
+    
 
     try {
     
       const product = new productModel();
-      console.log('product', product)
+     
       const categories = await Category.find();
 
       res.render("supplieradmin/product-form", {
@@ -198,33 +193,30 @@ router.post("/products/post", upload,
    async (req, res) => {
   // console.log('req.params.slug', req.params.slug)
   
-  console.log('reqest  fdfdsf', req.body)
-  console.log('reqest  req.files', req.files)
-  console.log('reqest  isNewRecord', req.body.isNewRecord)
 
   try {
 
     if( parseInt(req.body.isNewRecord) == 1)
     {
-      console.log('reqest  iffffff')
+      
       var loginUser = req.user
       var productDetails = new productModel()
       productDetails.user = loginUser._id
       let codeRandom = (Math.random() + 1).toString(36).substring(7);
-      console.log("random", codeRandom);
+      
 
       productDetails.productCode = codeRandom
     }
     else
     {
-      console.log('reqest  elseeeee')
+      
       var productDetails = await productModel.findById(req.body.id)
     }
     
    
     var loginUser = req.session.adminName
     //var productDetails = await productModel.findById(req.body.id)
-    console.log('productDetails', productDetails)
+   
     productDetails.title = req.body.title;
     // productDetails.productCode = req.body.productCode;
     productDetails.price = req.body.price;
@@ -255,7 +247,7 @@ router.post("/products/post", upload,
     
     productDetails.save(function(err, data){
         if(err) console.log(err);
-        console.log(data)
+       
         return res.redirect("/supplier-admin/products");
     })
 
@@ -291,7 +283,7 @@ router.get("/bids/:id", middleware.isLoggedIn, async (req, res) => {
      
       //.populate("productId");
       
-      console.log('items', items)
+    
       const count = await Bid.count({  });
 
       res.render("supplieradmin/bids", {
@@ -336,7 +328,7 @@ router.get("/bidconfirm/:id", middleware.isLoggedIn, async (req, res) => {
       const product = await productModel.findById(item.productId)
       
       //.populate("productId");
-      console.log('action', action)
+      
       
       item.confirm = action
       
@@ -349,9 +341,10 @@ router.get("/bidconfirm/:id", middleware.isLoggedIn, async (req, res) => {
         {
           product.bidConfirmed = true
           product.save()
+          
         }
         
-
+        addNotificationBid({action: action, bid: item, product: product})
 
         return res.redirect("/supplier-admin/products");
       })

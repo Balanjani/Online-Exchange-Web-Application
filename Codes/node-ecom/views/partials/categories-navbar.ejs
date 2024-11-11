@@ -18,10 +18,38 @@
           class="nav-item"
         <%} %> 
       >
-        <a class="nav-link" href="/products/">All</a>
+        <div class="dropdown nav-link">
+          <span>All</span>
+          <div class="dropdown-content">
+            <ul>
+            <% if (categories) { %>
+              <% categories.forEach( category => { %>
+                <li <% if (pageName === category.title) { %>
+                  class="nav-item active"
+                  <% } else { %>
+                    class="nav-item"
+                  <% } %> 
+                >
+                <a class="nav-link black" href="/products/<%= category.slug %>"><%= category.title %></a>
+              </li>
+                <% }) %>
+            <% } %>
+          </ul>
+          </div>
+        </div>
+        <!-- <a class="nav-link" href="/products/">All</a> -->
       </li>
+      <% if (login) { %>
+        <li>
+          <a class="nav-link" href="/supplier-admin/products/">Manage Products</a>
+        </li>
+        <li>
+          <a class="nav-link" href="/categories/">Manage Categories</a>
+        </li>
 
-      <% if (categories) { %>
+      <% } %>
+
+      <!-- <% if (categories) { %>
         <% categories.forEach( category => { %>
           <li <% if (pageName === category.title) { %>
             class="nav-item active"
@@ -32,7 +60,7 @@
           <a class="nav-link" href="/products/<%= category.slug %>"><%= category.title %></a>
         </li>
           <% }) %>
-      <% } %>
+      <% } %> -->
     </ul>
   </div>
 </nav>

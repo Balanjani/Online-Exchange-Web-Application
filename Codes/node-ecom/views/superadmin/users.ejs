@@ -1,0 +1,78 @@
+<%- include ../partials/header %> <%- include ../partials/categories-navbar %>
+
+<div class="container-fluid">
+  <!-- Flash messages -->
+  
+  <!-- Breadcrumbs -->
+  <div class="row mt-2">
+    <div class="col-md-12 m-auto">
+      <%if (breadcrumbs) { %>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <% breadcrumbs.forEach(crumb => { if(!crumb.name.startsWith("?")){%>
+          <li class="breadcrumb-item" aria-current="page">
+            <a href="<%=crumb.url%>"><%= crumb.name %></a>
+          </li>
+          <%}})%>
+        </ol>
+      </nav>
+      <%} %>
+    </div>
+  </div>
+  
+
+  <% if(pageName == 'All Categories') { %>
+  <div class="text-center hero-container">
+    <img
+      class="d-block w-100 hero-image"
+      src="/images/banner-all-products.jpg"
+    />
+    <div class="hero-text">
+      <h1><%=pageName%></h1>
+    </div>
+  </div>
+  <%} else {%> <%categories.forEach( category => {%> <%if(pageName ==
+  category.title){%>
+  <div class="text-center hero-container">
+    <img
+      class="d-block w-100 hero-image"
+      src="/images/banner-<%=category.slug%>.jpg"
+    />
+    <div class="hero-text">
+      <h1><%=pageName%></h1>
+    </div>
+  </div>
+  <%}%> <%})%> <%}%>
+
+  <hr class="gradient-style" />
+  <!-- Contents -->
+  <div class="row pl-4 pr-4">
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+           <th scope="col">Phone</th>
+           <!-- <th scope="col">Actions</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach((product, index) => { %>
+        <tr>
+          <td scope="row"><%= index + 1 %></td>
+          <td><%= product.username %></td>
+          <td><%= product.email %></td>
+          <td><%= product.phone %></td>
+          <!-- <td><%- include ../partials/action-btns %></td> -->
+        </tr>
+        <% }) %>
+        
+      </tbody>
+    </table>
+
+
+  <%- include ../partials/pagination %>
+</div>
+<%- include ../partials/footer %>

@@ -1,7 +1,7 @@
 
 
 <%- include ../partials/header %> <%- include ../partials/categories-navbar %>
-<meta http-equiv="refresh" content="3">
+
 
 
 <div class="container-fluid">
@@ -21,8 +21,17 @@
             <ul class="list-group">
                 
                 <% for(let i=0; i<destArray.length; i++) { %>
-                    <li class="list-group-item"><a href="/chat/chatseller/<%=destArray[i].userTo._id%>"><%=destArray[i].userFrom.username%></a></li>
-                   
+                    <li class="list-group-item">
+                        <a href="/chat/chatseller/<%=destArray[i].userFrom._id%>">
+                            <%=destArray[i].userFrom.username%>
+                            <% if(destArray[i].messageReadTo == false) { %> 
+                                <span class="message-dot"><i class="fa-solid fa-circle"></i></span>
+
+                            
+                            <% } %> 
+                        </a>
+                        
+                    </li>
                 <%}%>
             </ul>
         </div>
@@ -32,3 +41,18 @@
 
 
 <%- include ../partials/footer %>
+
+
+<script>
+
+window.addEventListener( "pageshow", function ( event ) {
+  var historyTraversal = event.persisted || 
+                         ( typeof window.performance != "undefined" && 
+                              window.performance.navigation.type === 2 );
+  if ( historyTraversal ) {
+    // Handle page restore.
+    // alert('fdsfds')
+    window.location.reload();
+  }
+});
+</script>

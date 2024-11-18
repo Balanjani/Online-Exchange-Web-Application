@@ -1,7 +1,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-    <meta http-equiv="refresh" content="3">
     <script>
         $(function() {
             // require socker.io
@@ -15,6 +14,7 @@
             var users_ele    = $('#users');
             var messages_ele = $('#message-list');
             var typing_ele   = $('#typing');
+            var currentUserId   = $('#current-user-id').val();
 
             messages_ele.scrollTop($('#message-list')[0].scrollHeight);
 
@@ -92,15 +92,15 @@
            
             // get emit chat-message from server site
             socket.on('chat-message', function(res) {
-                console.log('message', res)
+               
 
                 // remove typing item
                 typing_ele.find('#' + res.id).remove();
-
+                let alignClass = res.message_from == currentUserId ?   'text-left' : 'text-right'
                 if (res.id == window.socket_id) {
                     // it is me
                     var _html = `
-                        <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2" >
+                        <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2 ${alignClass}" >
                                 <div style="width: 100%;  font-size: 1em; font-weight: 700;">${res.message_from_name}</div>
                                 <div style="width: 100%;">${res.msg}</div>
                         </div>
@@ -110,7 +110,7 @@
                     
                 } else {
                     var _html = `
-                        <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2" >
+                        <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2 ${alignClass}" >
                                 <div style="width: 100%;  font-size: 1em; font-weight: 700;">${res.message_from_name}</div>
                                 <div style="width: 100%;">${res.msg}</div>
                         </div>
@@ -119,9 +119,32 @@
                 }
 
                 // _html += '<span class="chat-msg-msg">' + res.msg + '</span>';
-
+                
+                
                 messages_ele.append(_html);
                 messages_ele.scrollTop($('#message-list')[0].scrollHeight);
+                console.log('message', res)
+
+                let url = $('#baseurl').val()
+
+                
+                url = url + '/chat/changeMessageReadStatus?id=' + res.objId
+
+                if(res.message_from != currentUserId)
+                {
+                    $.ajax({url, success: function(result){
+                        //$("#div1").html(result);
+                        // alert('fdsf')
+                    }});
+                }
+               
+               
+                    
+                    
+                
+                
+
+                
             });
         });
     </script>
@@ -149,7 +172,8 @@
                     <div class="quikchat-title-area" style="text-align: left;">Chat</div>
                     <div class="quikchat-messages-area quikchat-messages-area-alt" style="height: calc(100% - 365px);" id="message-list">
                         <% for(let i=0; i<messages.length; i++) { %>
-                            <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2 <%= toString([i].userFrom) == toString(userFrom) ? 'text-left' : 'test-right'%>">
+                            <!-- <%= console.log('messages[i]', messages[i]) %> -->
+                            <div class="quikchat-message quikchat-msgid-0000000000 quikchat-message-2 <%= (messages[i].userFrom._id.toString() == userFrom.toString()) ? 'text-left' : 'text-right'%>">
                                 <div style="width: 100%;  font-size: 1em; font-weight: 700;"><%=messages[i].userFrom.username%></div>
                                 <div style="width: 100%;"><%=messages[i].message%></div>
                             </div>
@@ -174,6 +198,8 @@
         </div>
 
     </div>
+
+    <input type="hidden" id="current-user-id" value="<%= currentUserId%>" />
 </div>
 
 

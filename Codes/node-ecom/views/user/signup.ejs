@@ -1,15 +1,16 @@
-<%- include ../partials/header %> <%- include ../partials/categories-navbar %>
+<%- include ../partials/header %>
+<%- include ../partials/categories-navbar %>
 
 <div class="container">
   <div class="row">
     <div class="col-md-8 m-auto">
       <h1 class="mt-4 mb-4">Sign Up Page</h1>
-      <% if(errorMsg != null && errorMsg.length>0) {%>
-      <div id="flash-msg" class="alert alert-danger">
-        <%=errorMsg %>
-      </div>
-      <%}%>
-      <form action="/user/signup" method="POST">
+      <% if(errorMsg != null && errorMsg.length > 0) { %>
+        <div id="flash-msg" class="alert alert-danger">
+          <%= errorMsg %>
+        </div>
+      <% } %>
+      <form action="/user/signup" method="POST" id="signupForm">
         <div class="form-group">
           <label for="name">Name</label>
           <input
@@ -22,7 +23,7 @@
         </div>
         <div class="form-group">
           <label for="email">Email address</label>
-          <input type="email" class="form-control" name="email" id="email" />
+          <input type="email" class="form-control" name="email" id="email" required />
         </div>
         <div class="form-group">
           <label for="password">Password</label>
@@ -31,6 +32,9 @@
             class="form-control"
             name="password"
             id="password"
+            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
+            title="Password must be at least 8 characters long and include at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character."
+            required
           />
         </div>
         <div class="form-group">
@@ -40,6 +44,7 @@
             class="form-control"
             name="password2"
             id="password2"
+            required
           />
         </div>
         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
@@ -50,5 +55,18 @@
     </div>
   </div>
 </div>
+
+<script>
+  // JavaScript for password confirmation validation
+  document.getElementById('signupForm').addEventListener('submit', function (e) {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('password2').value;
+
+    if (password !== confirmPassword) {
+      e.preventDefault();
+      alert('Passwords do not match. Please try again.');
+    }
+  });
+</script>
 
 <%- include ../partials/footer %>

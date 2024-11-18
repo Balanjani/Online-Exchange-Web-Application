@@ -14,6 +14,11 @@ const {
   validateSignup,
   validateSignin,
 } = require("../config/validator");
+const connectDB = require("../config/db");
+const notification = require("../models/notification");
+const { forEach } = require("underscore");
+const { generateToken } = require("../helper/common");
+const { emailSender } = require("../helper/EmailSender");
 
 const csrfProtection = csrf();
 // router.use(csrfProtection);
@@ -58,7 +63,7 @@ router.post(
       // } else {
       //   // res.redirect("/user/profile");
       // }
-      console.log('sucessssss fdsf f fd fd')
+     
       req.flash("success", 'Verify from email');
       res.redirect("/");
     } catch (err) {
@@ -122,6 +127,57 @@ router.post(
 );
 
 
+
+
+// GET: display the signin form with csrf token
+router.get("/superadmin/signin", middleware.isNotLoggedIn, async (req, res) => {
+  var errorMsg = req.flash("error")[0];
+  res.render("user/super-admin-signin", {
+    csrfToken: 'fdsfds',
+    errorMsg,
+    pageName: "Sign In",
+  });
+});
+
+// POST: handle the signin logic
+router.post(
+  "/superadmin/signin",
+  [
+    middleware.isNotLoggedIn,
+    userSignInValidationRules(),
+    validateSignin,
+    passport.authenticate("local.signin", {
+      failureRedirect: "/user/superadmin/signin",
+      failureFlash: true,
+    }),
+  ],
+  async (req, res) => {
+    try {
+      console.log('req.user', req.user)
+      console.log('req.user.superadmin', req.user.superadmin)
+      console.log('req.user.phone  ', req.user.phone)
+      if(!req.user.superadmin)
+      {
+        req.logout();
+        req.session.cart = null;
+        req.flash("error", 'You do not have permission to access superadmin');
+        res.redirect("/user/superadmin/signin");
+        
+      }
+      else
+      {
+        res.redirect("/superadmin");
+      }
+      
+    } catch (err) {
+      console.log(err);
+      req.flash("error", err.message);
+      return res.redirect("/");
+    }
+  }
+);
+
+
 // GET: display user's profile
 router.get("/profile", middleware.isLoggedIn, async (req, res) => {
   const successMsg = req.flash("success")[0];
@@ -148,7 +204,7 @@ router.get("/profileupdate", middleware.isLoggedIn, async (req, res) => {
   const successMsg = req.flash("success")[0];
   const errorMsg = req.flash("error")[0];
    let user = await User.findById(req.user._id );
-   console.log('user', user)
+  
   try {
     // find all orders of this user
    
@@ -164,13 +220,58 @@ router.get("/profileupdate", middleware.isLoggedIn, async (req, res) => {
   }
 });
 
+
+// GET: display user's profile
+router.post("/profileupdate",
+  [
+    middleware.isLoggedIn,
+    
+  ],
+   async (req, res) => {
+  // console.log('req.params.slug', req.params.slug)
+  
+
+  
+  try {
+
+    var model =  await User.findById(req.user._id );
+    
+    
+   
+    //var productDetails = await productModel.findById(req.body.id)
+   
+    let pass = req.body.pass;
+    let confirm = req.body.confirmpass;
+    
+   
+    
+      model.username = req.body.username;
+      model.address = req.body.address;
+      model.phone = req.body.phone ;
+    
+      model.save(function(err, data){
+          if(err) console.log(err);
+          
+          return res.redirect('/');
+      })
+    
+
+    
+
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
 // GET: display user's profile
 router.get("/updatepassword", middleware.isLoggedIn, async (req, res) => {
   
   const successMsg = req.flash("success")[0];
   const errorMsg = req.flash("error")[0];
    let user = await User.findById(req.user._id );
-   console.log('user', user)
+
   try {
     // find all orders of this user
    
@@ -197,7 +298,7 @@ router.post("/updatepassword",
    async (req, res) => {
   // console.log('req.params.slug', req.params.slug)
   
-  console.log('reqest  fdfdsf', req.body)
+
   
   try {
 
@@ -206,7 +307,7 @@ router.post("/updatepassword",
     
    
     //var productDetails = await productModel.findById(req.body.id)
-    console.log('model', model)
+   
     let pass = req.body.pass;
     let confirm = req.body.confirmpass;
     
@@ -221,7 +322,190 @@ router.post("/updatepassword",
     
       model.save(function(err, data){
           if(err) console.log(err);
-          console.log(data)
+          
+          return res.redirect('/');
+      })
+    }
+
+    
+
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
+
+// GET: display user's profile
+router.get("/forgotpassword", middleware.isNotLoggedIn, async (req, res) => {
+  
+  const successMsg = req.flash("success")[0];
+  const errorMsg = req.flash("error")[0];
+  
+
+  try {
+    // find all orders of this user
+   
+    res.render("user/forgotpassword", {
+      errorMsg,
+      successMsg,
+      pageName: "Reset Password",
+    });
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
+
+// GET: display user's profile
+router.post("/forgotpassword",
+  [
+    middleware.isNotLoggedIn,
+    
+  ],
+   async (req, res) => {
+  // console.log('req.params.slug', req.params.slug)
+  
+
+  
+  try {
+
+    var model =  await User.findOne({email:req.body.email} );
+    
+    
+    if(!model)
+    {
+      req.flash("error", 'User not found');
+      res.redirect("/user/forgotpassword");
+      return true;
+    }
+    else{
+
+      model.forgotToken = generateToken()
+      model.forgotTokenStatus = true
+      model.forgotTokenTimeExpire = Date.now() + (20 * 60 * 1000)
+
+      req.flash("success", 'Link send in email to reset password');
+      let url  = `http://` + req.headers.host + `/user/resetpassword?token=${model.forgotToken  }`
+      console.log('url', url)
+     
+
+      
+      model.save(function(err, data){
+          if(err) console.log(err);
+          
+          emailSender({mailTo:model.email, data: { username : model.username, url: url  }, type: "resetPass"})
+          return res.redirect('/user/signin');
+      })
+    }
+
+    
+
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
+// GET: display user's profile
+router.get("/resetPassword", middleware.isNotLoggedIn, async (req, res) => {
+  
+  const successMsg = req.flash("success")[0];
+  const errorMsg = req.flash("error")[0];
+
+  if(!req.query.token)
+  {
+    req.flash("error", 'Invalid or expired token');
+    return res.redirect("/user/signin");
+  }
+
+  
+  let user = await User.findOne({ forgotToken: req.query.token, forgotTokenStatus: true });
+  if(!user) 
+  {
+    req.flash("error", 'Invalid token');
+    return res.redirect("/user/signin");
+  }
+  
+
+ 
+  try {
+    // find all orders of this user
+   
+    res.render("user/resetpassword", {
+      user: user,
+      errorMsg,
+      successMsg,
+      pageName: "User Profile",
+      token: req.query.token,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
+
+// GET: display user's profile
+router.post("/resetPassword",
+  [
+    middleware.isNotLoggedIn,
+    
+  ],
+   async (req, res) => {
+  // console.log('req.params.slug', req.params.slug)
+  
+
+  
+  try {
+
+
+    if(!req.body.token)
+      {
+        console.log('not token found')
+        req.flash("success", 'Invalid token');
+        return res.redirect("/");
+      }
+    
+     
+      let user = await User.findOne({forgotToken: req.body.token, forgotTokenStatus: true });
+      if(!user) 
+      {
+        console.log('not user found')
+        req.flash("error", 'Invalid token');
+        return res.redirect("/user/signin");
+      }
+      
+
+     
+      
+      console.log(' user found')
+  
+    //var productDetails = await productModel.findById(req.body.id)
+   
+    let pass = req.body.pass;
+    let confirm = req.body.confirmpass;
+    
+    if(pass != confirm)
+    {
+      console.log(' passowrd error')
+      req.flash("error", 'Passwords not match');
+      res.redirect("/user/resetpassword");
+      return true;
+    }
+    else{
+      console.log(' save user')
+      user.password = user.encryptPassword(pass);
+      user.forgotTokenStatus = false
+    
+      user.save(function(err, data){
+          if(err) console.log(err);
+          
           return res.redirect('/');
       })
     }
@@ -244,19 +528,35 @@ router.get("/logout", middleware.isLoggedIn, (req, res) => {
 });
 
 
+// GET: logout
+router.get("/notificationsstatuschange", middleware.isLoggedIn, async (req, res) => {
+
+
+  let list =  await notification.find({ user: req.user._id });
+
+  list.forEach(element => {
+    element.status= false;
+    element.save()
+  });
+ 
+  
+});
+
+
+
 // GET: display the form  form with csrf token
 router.get("/verifyToken", middleware.isNotLoggedIn, async (req, res) => {
 
   if(!req.query.token)
   {
-    console.log('token here')
+    
     req.flash("success", 'Invalid token');
     return res.redirect("/");
   }
 
-  console.log('req.get.token',req.query.token )
+ 
   let user = await User.findOne({ token: req.query.token, tokenstatus: true });
-  if(!user)
+  if(!user) 
   {
     req.flash("error", 'Invalid token');
     return res.redirect("/user/verifyToken");
@@ -266,7 +566,7 @@ router.get("/verifyToken", middleware.isNotLoggedIn, async (req, res) => {
   user.tokenstatus = false
   await user.save();
 
-  console.log('user', user)
+
   req.flash("success", 'Email verified, please login ');
   return res.redirect("/");
 

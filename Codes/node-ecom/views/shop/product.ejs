@@ -43,7 +43,11 @@
       <p><strong>Product code:</strong> <%=product.productCode%></p>
       <p><strong>Date added to the store:</strong> <%= moment(product.createdAt).format( 'MMMM Do YYYY')%></p>
       
-      <% if(isBidOpen && !product.bidConfirmed){ %>
+      <% if(confirmedBid){ %>
+        confirmedBid :  <%= confirmedBid.amount %>
+        <%} %>
+
+      <% if(isBidOpen){ %>
        <div> Highest Bid is <%= highestBid ?  highestBid.amount : '' %></div>
           Bid is open
           <form method="post" action="/products/add-bid">
@@ -57,11 +61,59 @@
       <%} %>
       <% if(canAddToCart) {%>
       <p class="is-available text-center">In stock</p>
-      <a href="/add-to-cart/<%=product._id%>" class="btn btn-block btn-secondary mt-3 mb-3 button-style">
+      <a id="add-cart-url" href="/add-to-cart/<%=product._id%>?quantity=1" class="btn btn-block btn-secondary mt-3 mb-3 button-style">
         Add to Shopping Cart
       </a>
+      <div>Quantity :</div>
+    <div>
+      <span id="q-plus"><i class="fa fa-plus-square" aria-hidden="true"></i> </span>
+      <span id="p-det-q" class="p-det-quantity"><%=1%></span>
+      <span id="q-minus"><i class="fa fa-minus-square" aria-hidden="true"></i></span>
+      
+    </div>
+      <div>
+       
+        <a href="/chat/chatseller/<%=product.user%>" class="btn btn-block btn-secondary mt-3 mb-3 button-style">
+          Chat with Seller
+        </a>
+      </div>
       <%} %>
     </div>
   </div>
 </div>
 <%- include ../partials/footer %>
+
+
+
+<script>
+let quan = parseInt($('#p-det-q').html())
+  
+
+function updateHref(quan){
+
+  $("#add-cart-url").attr("href", function(i, href){
+  var index = href.indexOf("?");
+  return (index == -1 ? href : href.substring(0, index)) + "?quantity=" + quan;
+});
+
+}
+  $('#q-plus').click(function(){
+   
+    let quan1 = parseInt($('#p-det-q').html())
+    $('#p-det-q').html(quan1 + 1)
+    updateHref(quan1 + 1)
+  })
+  $('#q-minus').click(function(){
+   
+   let quan1 = parseInt($('#p-det-q').html())
+   if(quan1 > 1)
+   {
+    $('#p-det-q').html(quan1 - 1)
+  
+  updateHref(quan1 - 1)
+   }
+  
+ })
+
+ 
+</script>

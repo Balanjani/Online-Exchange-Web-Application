@@ -276,15 +276,16 @@ router.get("/bids/:id", middleware.isLoggedIn, async (req, res) => {
     // const items = await Bid.find({productId: req.params.id});
     const perPage = 8;
       const items = await Bid.find({productId: req.params.id}) .skip(perPage * page - perPage)
-      .limit(perPage)
+      .limit(perPage).populate('user')
 
 
       const product = await productModel.findById(req.params.id)
      
       //.populate("productId");
+      console.log('bids', items)
       
     
-      const count = await Bid.count({  });
+      const count = await Bid.count({productId: req.params.id});
 
       res.render("supplieradmin/bids", {
         pageName: 'My Products',

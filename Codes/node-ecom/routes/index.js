@@ -18,8 +18,9 @@ router.get("/", async (req, res) => {
       .sort("-createdAt")
       .populate("category");
       var message = req.flash("success")[0];
-      console.log('11', req.flash("success"))
-      console.log('22', req.flash("message"))
+      // console.log('11', req.flash("success"))
+      // console.log('22', req.flash("message"))
+      // console.log('products', products)
     res.render("shop/home", { pageName: "Home", products, message:  message});
   } catch (error) {
     console.log(error);
@@ -51,6 +52,7 @@ router.get("/add-to-cart/:id", async (req, res) => {
     // add the product to the cart
     const product = await Product.findById(productId);
     const itemIndex = cart.items.findIndex((p) => p.productId == productId);
+    
     if (itemIndex > -1) {
       // if product exists in the cart, update the quantity
       cart.items[itemIndex].qty++;
@@ -235,7 +237,7 @@ router.post("/checkout", middleware.isLoggedIn, async (req, res) => {
       items: cart.items,
     },
     address: req.body.address,
-    paymentId: charge.id,
+    paymentId: "12313fdsfd",
   });
 
   order.save(async (err, newOrder) => {

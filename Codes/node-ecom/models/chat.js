@@ -32,6 +32,16 @@ const chatSchema = Schema({
     required: false,
     default: false
   },
+  messageReadFrom: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
+  messageReadTo: {
+    type: Boolean,
+    required: false,
+    default: false
+  },
 });
 
 module.exports = mongoose.model("Chat", chatSchema);

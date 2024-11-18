@@ -54,15 +54,17 @@
         <tr>
           <th scope="col">#</th>
           <th scope="col">Amount</th>
+          <th scope="col">User</th>
           <th scope="col">createdAt</th>
           <th scope="col">Confirm / Reject</th>
         </tr>
       </thead>
       <tbody>
-        <% items.forEach((item) => { %>
+        <% items.forEach((item, index) => { %>
         <tr>
-          <td scope="row">1</td>
+          <td scope="row"><%= index + 1 %></td>
           <td><%= item.amount %></td>
+          <td><%= item.user.username %></td>
           <td><%= item.createdAt %></td>
           <td>
             <% if(item.confirm == 0) { %>

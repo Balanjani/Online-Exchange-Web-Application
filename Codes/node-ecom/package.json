@@ -43,6 +43,7 @@
     "session": "^0.1.0",
     "slugify": "^1.6.5",
     "socket.io": "^4.8.0",
+    "socket.io-client": "^4.8.0",
     "stripe": "^8.219.0",
     "styled-components": "^5.3.5",
     "underscore": "^1.13.7"

@@ -63,9 +63,9 @@
         </tr>
       </thead>
       <tbody>
-        <% items.forEach((product) => { %>
+        <% items.forEach((product, index) => { %>
         <tr>
-          <td scope="row">1</td>
+          <td scope="row"><%= index + 1 %></td>
           <td class="w-img-100"> <img src="/uploads/<%= product.imagePath %>" /></td>
           <td><%= product.title %></td>
           <td><%- include ../partials/action-btns %></td>

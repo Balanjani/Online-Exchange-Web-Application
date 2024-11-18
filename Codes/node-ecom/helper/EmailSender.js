@@ -19,6 +19,25 @@ const getVerifyEmailHtml = (data) => {
 }
 
 
+const getResetEmailHtml = (data) => {
+  
+    let html = `
+      <div>
+        <div>
+          Welcome ${data.username},
+        </div>
+        <div>
+          Reset Password <a href="${data.url}">${data.url}</a>
+        </div>
+         
+      </div>
+    
+    `
+
+    return html
+}
+
+
 const emailSender = (props) => {
 
     const smtpTrans = nodemailer.createTransport({
@@ -41,6 +60,10 @@ const emailSender = (props) => {
         {
           html = getVerifyEmailHtml(props.data)
         }
+        if(props.type='resetPass')
+        {
+          html = getResetEmailHtml(props.data)
+        }
         console.log('html', html)
         return html
       }
@@ -50,6 +73,10 @@ const emailSender = (props) => {
       if(props.type='verifyToken')
       {
         sub = 'Verification Email'
+      }
+      if(props.type='resetPass')
+      {
+        sub = 'Reset Password Email'
       }
       return sub
     }
@@ -74,7 +101,7 @@ const emailSender = (props) => {
     });
 
 
-    console.log('props', props)
+  
 } 
 
 

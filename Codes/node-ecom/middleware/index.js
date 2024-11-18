@@ -15,4 +15,12 @@ middlewareObject.isLoggedIn = (req, res, next) => {
   res.redirect("/user/signin");
 };
 
+
+middlewareObject.isSuperUserLoggedIn = (req, res, next) => {
+  if (req.isAuthenticated() && req.user.superadmin) {
+    return next();
+  }
+  res.redirect("/user/signin");
+};
+
 module.exports = middlewareObject;

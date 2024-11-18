@@ -54,7 +54,15 @@ app.use(async (req, res, next) => {
     res.locals.session = req.session;
     res.locals.currentUser = req.user;
     const categories = await Category.find({}).sort({ title: 1 }).exec();
+    let notifications = []
+    if(req.user)
+       notifications = await Notification.find({ user: req.user._id, status: true }).populate(["user"]).limit(10);;
+    const baseUrl = 'http://localhost:3000';
+    // console.log('req.user._id', req.user._id)
+    // console.log('notifications', notifications)
     res.locals.categories = categories;
+    res.locals.notifications = notifications;
+    res.locals.baseUrl = baseUrl;
     next();
   } catch (error) {
     console.log(error);
@@ -91,8 +99,10 @@ const supplieradminRouter = require("./routes/supplieradmin");
 const categoriesRouter = require("./routes/categories");
 const chatRouter = require("./routes/chat");
 const userbids = require("./routes/userbids");
+const superadmin = require("./routes/superadmin");
 const { emailSender } = require("./helper/EmailSender");
 const { addMessage } = require("./service/chatService");
+const Notification = require("./models/notification");
 app.use("/products", productsRouter);
 app.use("/user", usersRouter);
 app.use("/pages", pagesRouter);
@@ -100,6 +110,7 @@ app.use("/supplier-admin", supplieradminRouter);
 app.use("/categories", categoriesRouter);
 app.use("/chat", chatRouter);
 app.use("/userbids", userbids);
+app.use("/superadmin", superadmin);
 app.use("/", indexRouter);
 
 // catch 404 and forward to error handler
@@ -150,8 +161,12 @@ io.on('connection', function(socket) {
     // event chat
     socket.on('chat-message', function(data) {
       // send emit chat-message to client site
-      io.emit('chat-message', data);
-      addMessage(data)
+      console.log('chat-message data', data)
+      addMessage(data).then(function(message) { 
+        console.log('chat-message data', message)
+        data.objId = message._id
+        io.emit('chat-message', data);
+      });
       
     });
   

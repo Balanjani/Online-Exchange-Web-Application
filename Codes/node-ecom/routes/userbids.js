@@ -41,7 +41,7 @@ router.get("/", middleware.isLoggedIn, async (req, res) => {
       .limit(perPage)
       .populate("productId");
       
-      console.log('items', items)
+   
       const count = await Bid.count({  });
 
       res.render("userbids/", {

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
     const uri = process.env.MONGO_URI || "";
-    console.log('uri', uri)
+    // console.log('uri', uri)
     await mongoose
       .connect(uri, {
         useNewUrlParser: true,
@@ -21,3 +21,12 @@ const connectDB = async () => {
 };
 
 module.exports = connectDB;
+
+
+
+
+//
+// 223.178.213.120
+
+// apptestp40325
+// MeRqZXmCXm1osG5v

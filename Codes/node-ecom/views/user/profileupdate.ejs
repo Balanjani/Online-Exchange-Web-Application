@@ -1,88 +1,37 @@
-<%- include ../partials/header %>  
-<%- include ../partials/categories-navbar %>
+<%- include ../partials/header %>  <%- include ../partials/categories-navbar %>
+
+
 
 <div class="container">
-  <!-- User Profile Update -->
   <h2 style="text-align: center;">User Profile</h2>
+  <div style=" text-align: center;">
+  </div>
 
-  <form method="post" action="/user/profileupdate" onsubmit="return validateProfileForm()">
+
+
+  <form method="post" action="/user/profileupdate" >
     <div class="form-group">
-      <label for="username">Name</label>
-      <input type="text" class="form-control" id="username" name="username" value="<%= user.username %>" required minlength="2" maxlength="50" pattern="[A-Za-z ]+" title="Name should only contain letters and spaces.">
+      <label for="exampleInputEmail1">Name</label>
+      <input type="text" class="form-control" id="fdfd" name="username" value="<%= user.username %>" required="true" >
+      
     </div>
     <div class="form-group">
-      <label for="address">Address</label>
-      <input type="text" class="form-control" id="address" name="address" value="<%= user.address %>" required minlength="5" maxlength="100" title="Please enter a valid address.">
+      <label for="exampleInputEmail1">Address</label>
+      <input type="text" class="form-control" id="fdfd" name="address" value="<%= user.address %>" required="true" >
+      
     </div>
     <div class="form-group">
-      <label for="phone">Phone</label>
-      <input type="text" class="form-control" id="phone" name="phone" value="<%= user.phone %>" required pattern="^[0-9]{10}$" title="Phone number should be 10 digits long.">
+      <label for="exampleInputEmail1">Phone</label>
+      <input type="text" class="form-control" id="fdfd" name="phone" value="<%= user.phone %>" required="true" >
+      
     </div>
     
-    <input type="hidden" name="id" value="<%= user._id %>">
-    <button type="submit" class="btn btn-primary">Update Profile</button>
+    
+   
+    <input type="hidden" name="id" value="<%= user._id %>" />
+    <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-</div>
 
-<hr>
-
-<div class="container">
-  <!-- Password Update Section -->
-  <h2 style="text-align: center;">Password Update</h2>
-
-  <!-- Email Validation Form (Request OTP) -->
-  <form method="post" action="/user/request-otp">
-    <div class="form-group">
-      <label for="email">Registered email:</label>
-      <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>" readonly>
-    </div>
-    <button type="submit" class="btn btn-primary">Request OTP</button>
-  </form>
-</div>
-<div class="container">
-  <h2 style="text-align: center;">Verify OTP & Update Password</h2>
-
-  <!-- OTP Verification and Password Update Form -->
-  <form method="post" action="/user/verify-otp" onsubmit="return validatePasswordForm()">
-    <div class="form-group">
-      <label for="otp">Enter OTP sent to your email:</label>
-      <input type="text" class="form-control" id="otp" name="otp" required pattern="^[0-9]{6}$" title="OTP should be a 6-digit number.">
-    </div>
-
-    <div class="form-group">
-      <label for="newpass">New Password:</label>
-      <input type="password" class="form-control" id="newpass" name="newpass" required minlength="8" title="Password should be at least 8 characters long.">
-    </div>
-
-    <div class="form-group">
-      <label for="confirmpass">Confirm Password:</label>
-      <input type="password" class="form-control" id="confirmpass" name="confirmpass" required minlength="8" title="Password should be at least 8 characters long.">
-    </div>
-
-    <button type="submit" class="btn btn-secondary">Update Password</button>
-  </form>
 </div>
 
 <%- include ../partials/footer %>
-
-<script>
-  function validateProfileForm() {
-    const phone = document.getElementById('phone').value;
-    const phonePattern = /^[0-9]{10}$/;
-    if (!phonePattern.test(phone)) {
-      alert("Phone number should be exactly 10 digits.");
-      return false;
-    }
-    return true;
-  }
-
-  function validatePasswordForm() {
-    const newPass = document.getElementById('newpass').value;
-    const confirmPass = document.getElementById('confirmpass').value;
-    if (newPass !== confirmPass) {
-      alert("Passwords do not match.");
-      return false;
-    }
-    return true;
-  }
-</script>

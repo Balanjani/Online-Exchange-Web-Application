@@ -109,10 +109,14 @@ router.get("/:slug", async (req, res) => {
 router.get("/:slug/:id", async (req, res) => {
   const successMsg = req.flash("success")[0];
   const errorMsg = req.flash("error")[0];
+
+  var loginUser = req.user
+  
+
   try {
     const product = await Product.findById(req.params.id).populate("category");
 
-    console.log('product', product)
+    // console.log('product', product)
     let currentDate = new Date()
    
     console.log('currentDate', currentDate)
@@ -121,30 +125,44 @@ router.get("/:slug/:id", async (req, res) => {
     const dateTo = new Date(product.bidDateClose);
     let dateFromTime = dateFrom.getTime()
     let dateToTime = dateTo.getTime()
-    console.log('dateTo', dateToTime)
+    // console.log('dateTo', dateToTime)
     dateToTime = dateToTime + ( 60 * 60 * 24)
     
 
     let isBidOpen = (currentDate.getTime() >= dateFromTime && currentDate.getTime() <= dateToTime ) 
+    
+
+    if(product.quantity < 1)
+      isBidOpen = false
+    
+    
+
     const highestBid = await Bid.findOne({ productId: product.id }).sort({amount: 'desc'});
     
-    const confirmedBid = await Bid.findOne({ productId: product.id, confirm: true }).sort({amount: 'desc'});
-
-    console.log('isBidOpen',isBidOpen)
-    console.log('product',product)
+    const confirmedBid = await Bid.findOne({ productId: product.id, confirm: 1, user: req.user._id }).sort({amount: 'desc'});
 
 
-    let canAddToCart = false;
-    if(confirmedBid && req.user)
+    if(loginUser)
     {
-      if(toString(confirmedBid.user) == toString(req.user._id))
-        canAddToCart = true
+     
+      if(loginUser._id.toString() === product.user.toString()) 
+      {
+        isBidOpen = false
+        //console.log('same user ')
+      }
+        
     }
-    console.log('confirmedBid', confirmedBid)
+  
+    // console.log('product',product)
 
-    console.log('highestBid', highestBid)
-    console.log('canAddToCart', canAddToCart)
-    console.log('req.user', req.user)
+
+    let canAddToCart = confirmedBid;
+    // if(confirmedBid && req.user)
+    // {
+    //   if(confirmedBid.user.toString() == req.user._id.toString())
+    //     canAddToCart = true
+    // }
+   
     res.render("shop/product", {
       pageName: product.title,
       product,
@@ -154,6 +172,7 @@ router.get("/:slug/:id", async (req, res) => {
       isBidOpen: isBidOpen,
       highestBid: highestBid,
       canAddToCart: canAddToCart,
+      confirmedBid: confirmedBid,
     });
   } catch (error) {
     console.log(error);
@@ -175,15 +194,13 @@ router.post("/add-bid",
    async (req, res) => {
   // console.log('req.params.slug', req.params.slug)
   
-  console.log('reqest  fdfdsf', req.body)
-  console.log('reqest  req.files', req.files)
-  console.log('reqest  isNewRecord', req.body.isNewRecord)
+
 
   try {
 
     var productDetails = await Product.findById(req.body.id)
    
-    console.log('productDetails', productDetails)
+ 
    
     var loginUser = req.session.adminName
     let bidModel = new Bid();
@@ -193,7 +210,7 @@ router.post("/add-bid",
 
     bidModel.save(function(err, data){
       if(err) console.log(err);
-      console.log(data)
+   
       return res.redirect("/products");
     })
   

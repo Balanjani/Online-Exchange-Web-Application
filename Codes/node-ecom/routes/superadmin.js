@@ -32,7 +32,7 @@ var upload = multer({
 var currentRoute = '/superadmin/'
 
 // GET: display user's profile
-router.get("/", middleware.isLoggedIn, async (req, res) => {
+router.get("/", middleware.isSuperUserLoggedIn, async (req, res) => {
     const successMsg = req.flash("success")[0];
     const errorMsg = req.flash("error")[0];
    
@@ -54,7 +54,7 @@ router.get("/", middleware.isLoggedIn, async (req, res) => {
 
   
 // GET: display user's profile
-router.get("/users", middleware.isLoggedIn, async (req, res) => {
+router.get("/users", middleware.isSuperUserLoggedIn, async (req, res) => {
     
 
   // var products =productModel.find({}); 
@@ -91,7 +91,7 @@ router.get("/users", middleware.isLoggedIn, async (req, res) => {
 
 
 // GET: display user's profile
-router.get("/orders", middleware.isLoggedIn, async (req, res) => {
+router.get("/orders", middleware.isSuperUserLoggedIn, async (req, res) => {
     
 
   // var products =productModel.find({}); 

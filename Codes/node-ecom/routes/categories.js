@@ -9,6 +9,7 @@ const User = require("../models/user");
 var moment = require("moment");
 var multer  = require('multer');
 var path = require('path');
+var mongodb = require('mongodb');
 
 var Storage= multer.diskStorage({
   destination:"./public/uploads/",
@@ -66,7 +67,7 @@ router.get("/", middleware.isLoggedIn, async (req, res) => {
 // GET: display user's profile
 router.get("/view/:slug", middleware.isLoggedIn, async (req, res) => {
     
-console.log('req.params.slug', req.params.slug)
+// console.log('req.params.slug', req.params.slug)
   
 
   try {
@@ -120,6 +121,24 @@ try {
 });
 
 
+
+// GET: display user's profile
+router.get("/delete/:slug", middleware.isLoggedIn, async (req, res) => {
+    
+ 
+  try {
+     
+    const result = await Category.deleteOne({_id: new mongodb.ObjectID(req.params.slug )} );
+  
+    return res.redirect("/categories");
+
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
   
 
 
@@ -136,7 +155,7 @@ router.get("/add", middleware.isLoggedIn, async (req, res) => {
     try {
     
       const item = new Category();
-      console.log('item', item)
+      // console.log('item', item)
       const categories = await Category.find();
 
       res.render("categories/form", {
@@ -184,7 +203,7 @@ router.post("/post", upload,
    
     var loginUser = req.session.adminName
     //var productDetails = await productModel.findById(req.body.id)
-    console.log('model', model)
+  
     model.title = req.body.title;
     
     
@@ -196,7 +215,7 @@ router.post("/post", upload,
     
     model.save(function(err, data){
         if(err) console.log(err);
-        console.log(data)
+        // console.log(data)
         return res.redirect(currentRoute);
     })
 

@@ -23,9 +23,26 @@ const userSchema = Schema({
     type: Boolean,
     require: false,
   },
+  forgotToken: {
+    type: String,
+    require: false,
+  },
+  forgotTokenStatus: {
+    type: Boolean,
+    require: false,
+  },
+  forgotTokenTimeExpire: {
+    type: String,
+    require: false,
+  },
   verified: {
     type: Boolean,
     require: false,
+  },
+  superadmin: {
+    type: Boolean,
+    require: false,
+    default: false,
   },
   address: {
     type: String,

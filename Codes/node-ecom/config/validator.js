@@ -4,22 +4,17 @@ const userSignUpValidationRules = () => {
   return [
     check("name", "Name is required").not().isEmpty(),
     check("email", "Invalid email").not().isEmpty().isEmail(),
-    check("password", "Password must be at least 4 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+    check("password", "Please enter a password with 4 or more characters")
       .not()
       .isEmpty()
-      .isLength({ min: 4 })
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{4,}$/),
+      .isLength({ min: 4 }),
   ];
 };
 
 const userSignInValidationRules = () => {
   return [
     check("email", "Invalid email").not().isEmpty().isEmail(),
-    check("password", "Password must be at least 4 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character")
-      .not()
-      .isEmpty()
-      .isLength({ min: 4 })
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{4,}$/),
+    check("password", "Invalid password").not().isEmpty().isLength({ min: 4 }),
   ];
 };
 
@@ -62,6 +57,18 @@ const validateSignin = (req, res, next) => {
   }
   next();
 };
+const validateSuperadminSignin = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    var messages = [];
+    errors.array().forEach((error) => {
+      messages.push(error.msg);
+    });
+    req.flash("error", messages);
+    return res.redirect("/user/signin");
+  }
+  next();
+};
 
 const validateContactUs = (req, res, next) => {
   const errors = validationResult(req);
@@ -83,5 +90,6 @@ module.exports = {
   userContactUsValidationRules,
   validateSignup,
   validateSignin,
+  validateSuperadminSignin,
   validateContactUs,
 };

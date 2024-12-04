@@ -80,6 +80,31 @@
       <%} %>
     </div>
   </div>
+
+
+  <% if(hasUserOrdered){ %>
+  <div class="rating-div">
+    Give Rating
+    <div class="rating-stars">
+      <input type="radio" name="rating" id="rs1" value="1"><label for="rs1"></label>
+      <input type="radio" name="rating" id="rs2" value="2"><label for="rs2"></label>
+      <input type="radio" name="rating" id="rs3" value="3"><label for="rs3"></label>
+      <input type="radio" name="rating" id="rs4" value="4"><label for="rs4"></label>
+      <input type="radio" checked="checked" name="rating" id="rs5" value="5"><label for="rs5"></label>
+      <!-- <span class="rating-counter"></span> -->
+    </div>
+    <div>
+      <div>
+        <textarea name="comment" id="comment" rows="5"></textarea>
+        <input type="hidden" name="productId" id="productId" value="<%= product._id%>"/>
+      </div>
+      <div>
+        <button class="btn btn-primary" onClick="submitRating()">Submit</button>
+      </div>
+    </div>
+
+  </div>
+  <%} %>
 </div>
 <%- include ../partials/footer %>
 
@@ -114,6 +139,41 @@ function updateHref(quan){
    }
   
  })
+
+
+
+$('input[type=radio][name=rating]').change(function() {
+  // alert($(this).val())
+    
+   
+});
+
+
+function submitRating()
+{
+  let url = $('#baseurl').val()             
+  url = url + '/products/add-rating'
+  // alert( $('input[name=rating]:checked').val())
+  // alert( $('input[name="rating"]:checked').val())
+  
+  // return true
+  let data = {
+    rating: $('input[name="rating"]:checked').val(),
+    comment: $('#comment').val(),
+    productId: $('#productId').val()
+  }
+
+  $.ajax({url, data: data,type: 'POST',
+  contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+   success: function(result){
+    setTimeout(() => {
+      alert('Thanks for the feedback')
+      $('#comment').val('')
+    }, 300);
+  }});
+
+
+}
 
  
 </script>

@@ -5,6 +5,9 @@ const Category = require("../models/category");
 var moment = require("moment");
 const middleware = require("../middleware");
 const Bid = require("../models/bid");
+const order = require("../models/order");
+const { forEach } = require("underscore");
+const rating = require("../models/rating");
 
 // GET: display all products
 router.get("/", async (req, res) => {
@@ -116,7 +119,7 @@ router.get("/:slug/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate("category");
 
-    // console.log('product', product)
+    console.log('product', product)
     let currentDate = new Date()
    
     console.log('currentDate', currentDate)
@@ -138,13 +141,36 @@ router.get("/:slug/:id", async (req, res) => {
     
 
     const highestBid = await Bid.findOne({ productId: product.id }).sort({amount: 'desc'});
-    
-    const confirmedBid = await Bid.findOne({ productId: product.id, confirm: 1, user: req.user._id }).sort({amount: 'desc'});
 
+    let confirmedBid = ''
+    let hasUserOrdered = false
+
+    if(req.user)
+      
 
     if(loginUser)
     {
      
+      confirmedBid = await Bid.findOne({ productId: product.id, confirm: 1, user: req.user._id }).sort({amount: 'desc'});
+      let orders = await order.find({ user: req.user._id }).sort({amount: 'desc'});
+      orders.forEach((item) => {
+        // console.log(item);
+        // console.log('item.items',item.cart.items);
+        if(item.cart && item.cart.items)
+        {
+          item.cart.items.forEach((prod) => {
+            //  console.log('prod', prod);
+            //  console.log('product.productId.toString()', prod.productId.toString());
+            //  console.log(' product._id.toString()',  product._id.toString());
+            if(prod.productId.toString() ==  product._id.toString())
+              hasUserOrdered = true
+            
+          })
+        }
+         
+      })
+      console.log('hasUserOrdered', hasUserOrdered)
+
       if(loginUser._id.toString() === product.user.toString()) 
       {
         isBidOpen = false
@@ -152,6 +178,8 @@ router.get("/:slug/:id", async (req, res) => {
       }
         
     }
+
+    // console.log('hasUserOrdered', hasUserOrdered)
   
     // console.log('product',product)
 
@@ -173,6 +201,7 @@ router.get("/:slug/:id", async (req, res) => {
       highestBid: highestBid,
       canAddToCart: canAddToCart,
       confirmedBid: confirmedBid,
+      hasUserOrdered: hasUserOrdered,
     });
   } catch (error) {
     console.log(error);
@@ -232,6 +261,45 @@ router.post("/add-bid",
   } catch (err) {
     console.log(err);
     return res.redirect("/");
+  }
+});
+
+
+
+
+
+// GET: display user's profile
+router.post("/add-rating",
+  [
+    middleware.isLoggedIn,
+    
+  ],
+   async (req, res) => {
+  try {
+
+    var productDetails = await Product.findById(req.body.productId)
+    console.log('req.body', req.body)
+   
+ 
+ 
+     let ratingModel = new rating();
+     ratingModel.rating = req.body.rating
+     ratingModel.comment = req.body.comment
+     ratingModel.productId = req.body.productId
+     ratingModel.user =  req.user._id
+    
+
+     ratingModel.save(function(err, data){
+      if(err) console.log(err);
+   
+      res.json({ message: 'success', status: 200 });
+    })
+
+   
+
+  } catch (err) {
+    console.log(err);
+    //return res.redirect("/");
   }
 });
 

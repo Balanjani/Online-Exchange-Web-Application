@@ -6,6 +6,7 @@ const Category = require("../models/category");
 const Cart = require("../models/cart");
 const Order = require("../models/order");
 const middleware = require("../middleware");
+const bid = require("../models/bid");
 const router = express.Router();
 
 // const csrfProtection = csrf();
@@ -31,6 +32,11 @@ router.get("/", async (req, res) => {
 // GET: add a product to the shopping cart when "Add to cart" button is pressed
 router.get("/add-to-cart/:id", async (req, res) => {
   const productId = req.params.id;
+  const userConfirmBid = await bid.findOne({ user: req.user._id, productId:  productId, confirm: 1});
+  console.log('add-to-cart quantity', req.query.quantity)
+  console.log('userConfirmBid', userConfirmBid)
+  let quan = parseInt(req.query.quantity)
+
   try {
     // get the correct cart, either from the db, session, or an empty cart.
     let user_cart;
@@ -55,23 +61,38 @@ router.get("/add-to-cart/:id", async (req, res) => {
     
     if (itemIndex > -1) {
       // if product exists in the cart, update the quantity
-      cart.items[itemIndex].qty++;
-      cart.items[itemIndex].price = cart.items[itemIndex].qty * product.price;
-      cart.totalQty++;
-      cart.totalCost += product.price;
+      if(quan)
+      {
+        cart.items[itemIndex].qty = cart.items[itemIndex].qty + quan;
+        cart.totalQty = cart.totalQty + quan ;
+        cart.totalCost += parseInt(userConfirmBid.amount) * quan;
+      }
+      else
+      {
+        cart.items[itemIndex].qty++;
+        cart.totalQty++;
+        cart.totalCost += parseInt(userConfirmBid.amount) 
+      }
+        
+
+      cart.items[itemIndex].price = cart.items[itemIndex].qty * parseInt(userConfirmBid.amount);
+      
+      console.log('222')
     } else {
       // if product does not exists in cart, find it in the db to retrieve its price and add new item
+      console.log('hahahaha')
       cart.items.push({
         productId: productId,
-        qty: 1,
-        price: product.price,
+        qty: quan,
+        price: parseInt(userConfirmBid.amount) * quan,
         title: product.title,
         productCode: product.productCode,
+        userBid: parseInt(userConfirmBid.amount)
       });
-      cart.totalQty++;
-      cart.totalCost += product.price;
+      cart.totalQty = quan;
+      cart.totalCost += parseInt(userConfirmBid.amount) * quan;
     }
-
+    console.log('cart', cart)
     // if the user is logged in, store the user's id and save cart to the db
     if (req.user) {
       cart.user = req.user._id;
@@ -104,20 +125,28 @@ router.get("/shopping-cart", async (req, res) => {
         products: await productsFromCart(cart_user),
       });
     }
-    // if there is no cart in session and user is not logged in, cart is empty
-    if (!req.session.cart) {
+    else
+    {
       return res.render("shop/shopping-cart", {
-        cart: null,
-        pageName: "Shopping Cart",
-        products: null,
-      });
+            cart: null,
+            pageName: "Shopping Cart",
+            products: null,
+          });
     }
-    // otherwise, load the session's cart
-    return res.render("shop/shopping-cart", {
-      cart: req.session.cart,
-      pageName: "Shopping Cart",
-      products: await productsFromCart(req.session.cart),
-    });
+    // // if there is no cart in session and user is not logged in, cart is empty
+    // if (!req.session.cart) {
+    //   return res.render("shop/shopping-cart", {
+    //     cart: null,
+    //     pageName: "Shopping Cart",
+    //     products: null,
+    //   });
+    // }
+    // // otherwise, load the session's cart
+    // return res.render("shop/shopping-cart", {
+    //   cart: req.session.cart,
+    //   pageName: "Shopping Cart",
+    //   products: await productsFromCart(req.session.cart),
+    // });
   } catch (err) {
     console.log(err.message);
     res.redirect("/");
@@ -129,6 +158,7 @@ router.get("/reduce/:id", async function (req, res, next) {
   // if a user is logged in, reduce from the user's cart and save
   // else reduce from the session's cart
   const productId = req.params.id;
+  const userConfirmBid = await bid.findOne({ user: req.user._id, productId:  productId, confirm: 1});
   let cart;
   try {
     if (req.user) {
@@ -144,9 +174,9 @@ router.get("/reduce/:id", async function (req, res, next) {
       const product = await Product.findById(productId);
       // if product is found, reduce its qty
       cart.items[itemIndex].qty--;
-      cart.items[itemIndex].price -= product.price;
+      cart.items[itemIndex].price -= parseInt(userConfirmBid.amount);
       cart.totalQty--;
-      cart.totalCost -= product.price;
+      cart.totalCost -= parseInt(userConfirmBid.amount);
       // if the item's qty reaches 0, remove it from the cart
       if (cart.items[itemIndex].qty <= 0) {
         await cart.items.remove({ _id: cart.items[itemIndex]._id });
@@ -266,6 +296,7 @@ async function productsFromCart(cart) {
     ).toObject();
     foundProduct["qty"] = item.qty;
     foundProduct["totalPrice"] = item.price;
+    foundProduct["userBid"] = item.userBid;
     products.push(foundProduct);
   }
   return products;

@@ -1,32 +1,23 @@
-<%- include ../partials/header %>  <%- include ../partials/categories-navbar %>
-
-
+<%- include ../partials/header %>  
+<%- include ../partials/categories-navbar %>
 
 <div class="container">
   <h2 style="text-align: center;">Product Form</h2>
-  <div style=" text-align: center;">
-  </div>
-
-
 
   <form method="post" action="/supplier-admin/products/post"  enctype="multipart/form-data">
     <div class="form-group">
       <label for="exampleInputEmail1">Title</label>
       <input type="text" class="form-control" id="fdfd" name="title" value="<%= product.title %>" required="true" >
-      
     </div>
-    <!-- <div class="form-group">
-      <label for="exampleInputPassword1">Product Code</label>
-      <input type="text" class="form-control" id="asdfds" name="productCode" placeholder=""  value="<%= product.productCode %>" >
-    </div> -->
+
     <div class="form-group">
       <label for="exampleInputPassword1">Price</label>
-      <input type="number" class="form-control" id="price" placeholder="" name="price"  value="<%= product.price %>" required="true">
+      <input type="number" class="form-control" id="price" placeholder="" name="price" value="<%= product.price %>" required="true">
     </div>
     
     <div class="form-group">
       <label for="exampleInputPassword1">Quantity</label>
-      <input type="number" class="form-control" id="quantity" placeholder="" name="quantity"  value="<%= product.quantity %>" required="true">
+      <input type="number" class="form-control" id="quantity" placeholder="" name="quantity" value="<%= product.quantity %>" required="true">
     </div>
 
     <div class="form-group">
@@ -37,35 +28,39 @@
           <% 
           var selected = ''
           if(product.category) {  
-          selected = data.title == product.category.title  ? "selected" : "" ; 
+            selected = data.title == product.category.title  ? "selected" : "" ; 
           } %>
           <option value="<%= data._id %>"  <%=selected %> ><%= data.title %> </option>
         <% }) %>
       </select>
     </div> 
+
     <div class="form-group">
       <label for="exampleInputPassword1">Description</label>
-      <textarea required="true" value="<%= product.description %>"   class="form-control" name="description" id="desc"><%= product.description %></textarea>
+      <textarea required="true" value="<%= product.description %>" class="form-control" name="description" id="desc"><%= product.description %></textarea>
     </div>
+
     <div class="form-group">
       <label for="exampleFormControlFile1">Image</label>
       <input type="file" class="form-control-file" name="imagePath" id="fdffff" value="<%= product.imagePath %>" >
     </div>
+
     <div class="form-group">
       <label for="exampleFormControlFile1">Bidding Open Date</label>
-      <input required="true" type="date" class="form-control-file" name="bidDateOpen" id="dddd"  value="<%= product.bidDateOpen %>" min='<%= new Date().toISOString().split("T")[0] %>' >
+      <input required="true" type="date" class="form-control-file" name="bidDateOpen" id="dddd" value="<%= product.bidDateOpen %>" min='<%= new Date().toISOString().split("T")[0] %>' >
     </div>
+
     <div class="form-group">
       <label for="exampleFormControlFile1">Bidding Close Date</label>
-      <input required="true" type="date" class="form-control-file" name="bidDateClose" id="deeefrr"  value="<%= product.bidDateClose %>"  min='<%= new Date().toISOString().split("T")[0] %>'>
+      <input required="true" type="date" class="form-control-file" name="bidDateClose" id="deeefrr" value="<%= product.bidDateClose %>"  min='<%= new Date().toISOString().split("T")[0] %>'>
     </div>
+
     <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-    
     <input type="hidden" name="isNewRecord" value="<%= isNewRecord %>" />
     <input type="hidden" name="id" value="<%= product.id %>" />
+
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-
 </div>
 
 <%- include ../partials/footer %>

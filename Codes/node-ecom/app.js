@@ -191,7 +191,7 @@ module.exports = app;
 
 
 
-// emailSender({mailTo:"sainijs7@gmail.com", message:"This is test message for email"})
+// emailSender({mailTo:"balanjani.chinnari@gmail.com", message:"This is test message for email"})
 
 
 

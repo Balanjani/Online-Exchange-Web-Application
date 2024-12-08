@@ -1,11 +1,13 @@
-<%- include ../partials/header %> <%- include ../partials/categories-navbar %>
+<%- include ../partials/header %> 
+<%- include ../partials/categories-navbar %>
+
 <div class="container cart">
-  <% if (cart != null && !cart.paid ) { %>
+  <% if (cart != null && !cart.paid) { %>
   <div class="row">
     <div class="col-md-11 col-sm-12 m-auto table-responsive">
       <table class="table text-center">
         <thead>
-          <tr >
+          <tr>
             <th>Product</th>
             <th>&nbsp;</th>
             <th>&nbsp;</th>
@@ -17,60 +19,55 @@
           </tr>
         </thead>
         <tbody>
-          <% products.forEach( product => { %> <% if(product != null) {%>
+          <% let totalCost = 0; %> <!-- Initialize totalCost variable -->
+          <% products.forEach(product => { %> 
+          <% if (product != null) { %>
           <tr class="my-auto">
             <td>
-              <a
-              href="/products/<%=product.category.slug%>/<%=product._id%>"
-            >
-              <img src="/uploads/<%=product.imagePath%>" class="img-small image-fluid" alt="image thumbnail" />
+              <a href="/products/<%=product.category.slug%>/<%=product._id%>">
+                <img src="/uploads/<%=product.imagePath%>" class="img-small image-fluid" alt="image thumbnail" />
               </a>
             </td>
             <td>
               <div class="float-left mb-3">
-                <a class="title-link"
-                href="/products/<%=product.category.slug%>/<%=product._id%>"
-              >
-                <h6 class="text-left"><%= product.title %></h6> 
-                <p class="text-left">Product No: <%= product.productCode %></p>
+                <a class="title-link" href="/products/<%=product.category.slug%>/<%=product._id%>">
+                  <h6 class="text-left"><%= product.title %></h6> 
+                  <p class="text-left">Product No: <%= product.productCode %></p>
+                </a>
               </div>
-              
+            </td>
+            <td class="text-center">
+              <a href="/add-to-cart/<%=product._id%>">
+                <i class="fa fa-plus-square" aria-hidden="true"></i>
               </a>
             </td>
             <td class="text-center">
-              <a href="/add-to-cart/<%=product._id%>"
-                ><i class="fa fa-plus-square" aria-hidden="true"></i
-              > </a>
+              <form action="/update-quantity/<%=product._id%>" method="post">
+                <input type="number" name="quantity" value="<%= product.quantity %>" min="1" class="form-control qty-display pt-1" />
+              </form>
             </td>
             <td class="text-center">
-              <p class="qty-display pt-1">
-              <%= product.qty %>
-            </p>
-          </td>
-            <td class="text-center" >
-              <a href="/reduce/<%=product._id%>"
-                ><i class="fa fa-minus-square" aria-hidden="true"></i
-              ></a>
+              <a href="/reduce/<%=product._id%>">
+                <i class="fa fa-minus-square" aria-hidden="true"></i>
+              </a>
             </td>
-            <td>$<%= product.price %></td>
-            <td>$<%= product.totalPrice %></td>
+            <td>$<%= product.price %></td> <!-- Display price per unit -->
+            <td>$<%= (product.price * product.quantity).toFixed(2) %></td> <!-- Calculate the subtotal (price * quantity) -->
             <td>
-              <a
-                href="/removeAll/<%=product._id%>"
-                class="btn btn-danger btn-sm button-style-danger"
-                >Remove all</a
-              >
+              <a href="/removeAll/<%=product._id%>" class="btn btn-danger btn-sm button-style-danger">Remove all</a>
             </td>
           </tr>
-          <% } %> <% }) %>
+          <% totalCost += (product.price * product.quantity); %> <!-- Add the product subtotal to totalCost -->
+          <% } %> 
+          <% }) %>
         </tbody>
       </table>
     </div>
   </div>
-<hr>
+  <hr>
   <div class="row mt-4 mr-auto">
     <div class="col-md-11 col-sm-12 m-auto">
-      <strong>Total: <%= cart.totalCost %> </strong>
+      <strong>Total: $<%= totalCost.toFixed(2) %> </strong> <!-- Display the total cost -->
     </div>
   </div>
   <div class="row mt-2 mr-auto">
@@ -84,7 +81,6 @@
       <h2>No items in the cart</h2>
     </div>
   </div>
-
   <% } %>
 </div>
 

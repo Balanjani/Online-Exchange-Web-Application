@@ -75,9 +75,9 @@
           <td><%= product.title %></td>
           <td><%= product.price %></td>
           <% if(product.available) {%>
-          <td>Yes</td>
-          <% } else { %>
           <td>No</td>
+          <% } else { %>
+          <td>Yes</td>
           <%} %>
           <td><a href="/supplier-admin/bids/<%=product._id%>">Show Bids</a> </td>
           <td><%- include ../partials/action-btns %></td>

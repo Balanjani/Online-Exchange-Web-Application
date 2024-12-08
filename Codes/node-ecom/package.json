@@ -7,7 +7,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
-  "author": "Jaswinder Singh",
+  "author": "Balanjani Kamasani",
   "dependencies": {
     "admin-bro": "^2.9.0",
     "admin-bro-expressjs": "^2.1.1",

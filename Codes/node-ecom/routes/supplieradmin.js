@@ -12,6 +12,8 @@ var multer  = require('multer');
 var path = require('path');
 var mongodb = require('mongodb');
 const { addNotificationBid } = require("../service/notificationService");
+const order = require("../models/order");
+
 
 
 var Storage= multer.diskStorage({
@@ -347,8 +349,29 @@ router.get("/bidconfirm/:id", middleware.isLoggedIn, async (req, res) => {
         
         addNotificationBid({action: action, bid: item, product: product})
 
-        return res.redirect("/supplier-admin/products");
+       
       })
+
+      
+      if(action == 1)
+      {
+          let list =  await Bid.find({ productId: item.productId });
+          list.forEach(element => {
+            if(element._id.toString() != item._id.toString())
+            {
+              element.confirm= 2;
+              element.save()
+              addNotificationBid({action: 2, bid: item, product: product})
+            }
+            
+          
+          });
+      }
+      
+
+
+      return res.redirect("/supplier-admin/products");
+    
 
 
 
@@ -378,6 +401,72 @@ router.get("/products/delete/:slug", middleware.isLoggedIn, async (req, res) => 
 });
 
 
+
+// GET: display user's profile
+router.get("/orders", middleware.isLoggedIn, async (req, res) => {
+    
+
+  // var products =productModel.find({}); 
+  let page = parseInt(req.query.page) || 1;
+
+  try {
+   
+   
+    const perPage = 8;
+    const orders = await order.find({  })
+    .populate(['user'])
+    // .skip(perPage * page - perPage)
+    // .limit(perPage);
+    let items = await getordersuser(orders, req)
+
+    
+
+
+
+    
+    const count = await order.count({  });
+    console.log('orders', items)
+
+    res.render("supplieradmin/orders", {
+      pageName: 'My Products',
+      //currentCategory: foundCategory,
+      items: items,
+      current: page,
+      breadcrumbs: req.breadcrumbs,
+      home: currentRoute + "/orders?",
+      actionHome: currentRoute + "orders",
+      pages: Math.ceil(count / perPage),
+    });
+
+
+    
+  } catch (err) {
+    console.log(err);
+    return res.redirect("/");
+  }
+});
+
+
   
-  
+async function getordersuser(orders, req) {
+  let items = []
+
+
+  for (const order of orders) {
+    for (const prod of order.cart.items) {
+      let foundProduct = await productModel.findById(prod.productId).populate("category")
+      console.log('foundProduct', foundProduct)
+      if(foundProduct && foundProduct.user.toString() == req.user._id.toString())
+        {
+          items.push(order)
+        }
+    }
+
+  }
+  console.log('items', items)
+  return items
+
+}
+
+
   module.exports = router;

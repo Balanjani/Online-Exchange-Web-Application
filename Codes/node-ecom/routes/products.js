@@ -179,6 +179,10 @@ router.get("/:slug/:id", async (req, res) => {
         
     }
 
+    let confirmedBidAll = await Bid.findOne({ productId: product.id, confirm: 1 }).sort({amount: 'desc'});
+    if(confirmedBidAll)
+      isBidOpen = false
+
     // console.log('hasUserOrdered', hasUserOrdered)
   
     // console.log('product',product)

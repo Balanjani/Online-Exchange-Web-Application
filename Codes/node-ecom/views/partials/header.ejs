@@ -81,7 +81,7 @@
             <a href="/shopping-cart">
               <i class="fas fa-shopping-cart"></i> <% if(session.cart) { %>
               <span class="badge badge-pill badge-info"
-                ><%= session.cart.totalQty %></span
+                ><%= session.cart.items.length %></span
               >
               <% } else { %>
               <span class="badge badge-pill badge-info">0</span>

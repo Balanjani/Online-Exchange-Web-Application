@@ -7,6 +7,7 @@ const Cart = require("../models/cart");
 const Order = require("../models/order");
 const middleware = require("../middleware");
 const bid = require("../models/bid");
+const { addNotificationproductSold } = require("../service/notificationService");
 const router = express.Router();
 
 // const csrfProtection = csrf();
@@ -36,6 +37,7 @@ router.get("/add-to-cart/:id", async (req, res) => {
   console.log('add-to-cart quantity', req.query.quantity)
   console.log('userConfirmBid', userConfirmBid)
   let quan = parseInt(req.query.quantity)
+  
 
   try {
     // get the correct cart, either from the db, session, or an empty cart.
@@ -61,18 +63,18 @@ router.get("/add-to-cart/:id", async (req, res) => {
     
     if (itemIndex > -1) {
       // if product exists in the cart, update the quantity
-      if(quan)
-      {
-        cart.items[itemIndex].qty = cart.items[itemIndex].qty + quan;
-        cart.totalQty = cart.totalQty + quan ;
-        cart.totalCost += parseInt(userConfirmBid.amount) * quan;
-      }
-      else
-      {
-        cart.items[itemIndex].qty++;
-        cart.totalQty++;
-        cart.totalCost += parseInt(userConfirmBid.amount) 
-      }
+      // if(quan)
+      // {
+        cart.items[itemIndex].qty = product.quantity;
+        cart.totalQty = cart.totalQty + product.quantity ;
+        cart.totalCost += parseInt(userConfirmBid.amount) * product.quantity;
+      // }
+      // else
+      // {
+      //   cart.items[itemIndex].qty++;
+      //   cart.totalQty++;
+      //   cart.totalCost += parseInt(userConfirmBid.amount) 
+      // }
         
 
       cart.items[itemIndex].price = cart.items[itemIndex].qty * parseInt(userConfirmBid.amount);
@@ -83,14 +85,14 @@ router.get("/add-to-cart/:id", async (req, res) => {
       console.log('hahahaha')
       cart.items.push({
         productId: productId,
-        qty: quan,
-        price: parseInt(userConfirmBid.amount) * quan,
+        qty: product.quantity,
+        price: parseInt(userConfirmBid.amount) * product.quantity,
         title: product.title,
         productCode: product.productCode,
         userBid: parseInt(userConfirmBid.amount)
       });
-      cart.totalQty = quan;
-      cart.totalCost += parseInt(userConfirmBid.amount) * quan;
+      cart.totalQty = product.quantity;
+      cart.totalCost += parseInt(userConfirmBid.amount) * product.quantity;
     }
     console.log('cart', cart)
     // if the user is logged in, store the user's id and save cart to the db
@@ -109,6 +111,7 @@ router.get("/add-to-cart/:id", async (req, res) => {
 
 // GET: view shopping cart contents
 router.get("/shopping-cart", async (req, res) => {
+  // req.session.cart = null;
   try {
     // find the cart, whether in session or in db based on the user state
     let cart_user;
@@ -116,7 +119,7 @@ router.get("/shopping-cart", async (req, res) => {
       cart_user = await Cart.findOne({ user: req.user._id });
     }
     // if user is signed in and has cart, load user's cart from the db
-    console.log('cart hererer')
+    console.log('cart hererer', cart_user)
     if (req.user && cart_user) {
       req.session.cart = cart_user;
       return res.render("shop/shopping-cart", {
@@ -277,10 +280,20 @@ router.post("/checkout", middleware.isLoggedIn, async (req, res) => {
     }
     await cart.save();
     await Cart.findByIdAndDelete(cart._id);
+    req.session.cart = null;
     req.flash("success", "Successfully purchased");
     req.session.cart = null;
-    res.redirect("/user/profile");
+
+    
   });
+  req.session.cart = null;
+  
+  await afterOrder(cart),
+
+  
+
+  res.redirect("/user/profile");
+
 
 
   
@@ -301,5 +314,29 @@ async function productsFromCart(cart) {
   }
   return products;
 }
+
+async function afterOrder(cart) {
+  let products = []; // array of objects
+  for (const item of cart.items) {
+    let foundProduct = await Product.findById(item.productId).populate("category")
+    foundProduct.quantity = 0
+    foundProduct.save()
+    //products.push(foundProduct);
+
+    addNotificationproductSold({ product: foundProduct})
+
+    let list =  await bid.find({ productId: item.productId });
+    list.forEach(element => {
+      element.confirm= 2;
+      element.save()
+     // addNotificationBid({action: 2, bid: item, product: product})
+    
+    });
+
+  }
+  return products;
+}
+
+
 
 module.exports = router;

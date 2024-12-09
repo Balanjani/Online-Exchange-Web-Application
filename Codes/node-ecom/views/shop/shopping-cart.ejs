@@ -37,27 +37,23 @@
               </div>
             </td>
             <td class="text-center">
-              <a href="/add-to-cart/<%=product._id%>">
-                <i class="fa fa-plus-square" aria-hidden="true"></i>
-              </a>
+             
             </td>
             <td class="text-center">
-              <form action="/update-quantity/<%=product._id%>" method="post">
-                <input type="number" name="quantity" value="<%= product.quantity %>" min="1" class="form-control qty-display pt-1" />
-              </form>
+              
+                <input disabled="disabled" name="quantity" value="<%= product.quantity %>" min="1" class="form-control qty-display pt-1" />
+              
             </td>
             <td class="text-center">
-              <a href="/reduce/<%=product._id%>">
-                <i class="fa fa-minus-square" aria-hidden="true"></i>
-              </a>
+              
             </td>
-            <td>$<%= product.price %></td> <!-- Display price per unit -->
-            <td>$<%= (product.price * product.quantity).toFixed(2) %></td> <!-- Calculate the subtotal (price * quantity) -->
+            <td>$<%= product.userBid %></td> <!-- Display price per unit -->
+            <td>$<%= (product.userBid * product.quantity).toFixed(2) %></td> <!-- Calculate the subtotal (price * quantity) -->
             <td>
               <a href="/removeAll/<%=product._id%>" class="btn btn-danger btn-sm button-style-danger">Remove all</a>
             </td>
           </tr>
-          <% totalCost += (product.price * product.quantity); %> <!-- Add the product subtotal to totalCost -->
+          <% totalCost += (product.userBid * product.quantity); %> <!-- Add the product subtotal to totalCost -->
           <% } %> 
           <% }) %>
         </tbody>

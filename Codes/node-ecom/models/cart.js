@@ -21,6 +21,11 @@ const cartSchema = new mongoose.Schema({
       productCode: {
         type: String,
       },
+      userBid: {
+        type: Number,
+        default: 0,
+        required: false,
+      },
     },
   ],
   totalQty: {

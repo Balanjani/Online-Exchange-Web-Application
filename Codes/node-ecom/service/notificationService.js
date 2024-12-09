@@ -20,10 +20,27 @@ const addNotificationBid = (params) => {
 }
 
 
+const addNotificationproductSold = (params) => {
+   
+    var model = new Notification()
+    model.message = `Your product  ${params.product.title} is sold successfully`  ;
+    model.user = params.product.user;   
+    model.type = 'bid'  ;   
+    
+    console.log('addNotificationproductSold')
+    model.save(function(err, data){
+        if(err) console.log(err);
+        
+    })
+
+}
+
+
 
 
 
 
 module.exports = {
-    addNotificationBid
+    addNotificationBid,
+    addNotificationproductSold
 };

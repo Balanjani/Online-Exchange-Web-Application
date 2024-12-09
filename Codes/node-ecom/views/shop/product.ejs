@@ -92,6 +92,21 @@
     </div>
   <% } %>
 
+  <div>
+    <b>Customers Reviews</b>
+    <% ratingList.forEach((ratin, index) => { %>
+      <div class="row">
+        <div class="col-md-2 ">
+          Rating: <%= ratin.rating %>
+        </div>
+        <div class="col-md-8 ">
+          Comment: <%= ratin.comment %>
+        </div>
+       
+      </div>
+      <% }) %>
+      
+  </div>
 </div>
 
 

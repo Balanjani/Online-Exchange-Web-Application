@@ -194,6 +194,8 @@ router.get("/:slug/:id", async (req, res) => {
     //   if(confirmedBid.user.toString() == req.user._id.toString())
     //     canAddToCart = true
     // }
+
+    let ratingList = await rating.find({productId: product.id}).sort("-createdAt")
    
     res.render("shop/product", {
       pageName: product.title,
@@ -206,6 +208,7 @@ router.get("/:slug/:id", async (req, res) => {
       canAddToCart: canAddToCart,
       confirmedBid: confirmedBid,
       hasUserOrdered: hasUserOrdered,
+      ratingList: ratingList,
     });
   } catch (error) {
     console.log(error);

@@ -361,7 +361,7 @@ router.get("/bidconfirm/:id", middleware.isLoggedIn, async (req, res) => {
             {
               element.confirm= 2;
               element.save()
-              addNotificationBid({action: 2, bid: item, product: product})
+              addNotificationBid({action: 2, bid: element, product: product})
             }
             
           
